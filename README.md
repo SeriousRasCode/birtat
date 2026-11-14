@@ -92,7 +92,7 @@ Open:
 `pages/jobs.html` embeds standard `schema.org/JobPosting` JSON-LD so external job boards and search engines can index accessible roles.
 
 ## Languages and how to add one
-Translations live in `module/i18n/en.json` and `module/i18n/am.json`. After editing either file, run `node scripts/build-i18n.js` to embed the translations in the web component. This lets the sign-up work from `file://` as well as a web server. The current language choice is retained when a learner reloads the page.
+Translations live in `module/i18n/en.json` and `module/i18n/am.json`. After editing either file, run `node scripts/build-i18n.js` to embed the translations in the web component. If you change Amharic prompts, run `node scripts/build-audio.js` while online to regenerate the bundled MP3 clips. Amharic Listen prompts then play offline, even when the device has no Amharic speech voice. The current language choice is retained when a learner reloads the page.
 
 ## Offline and slow connection
 * Every answer saves immediately to `localStorage`; reloading resumes on the exact step.
