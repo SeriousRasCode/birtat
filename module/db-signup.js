@@ -8,6 +8,136 @@ const ICONS = {
 
 const STORAGE_KEY = 'db_signup_state_v1';
 const SCRIPT_BASE = document.currentScript ? new URL('.', document.currentScript.src).href : './';
+// BEGIN GENERATED TRANSLATIONS (run `node scripts/build-i18n.js` after editing JSON)
+const TRANSLATIONS = {
+  "am": {
+    "title": "ብርታት ተደራሽ ምዝገባ",
+    "keypadOn": "የቁጥር መደወያ፡ በርቷል",
+    "keypadOff": "የቁጥር መደወያ (1-2-3)",
+    "sunlight": "የፀሐይ ብርሃን ንፅፅር",
+    "listen": "ያዳምጡ",
+    "audioUnavailable": "ድምፅ ማጫወት አልተቻለም። የመሣሪያዎን የድምፅ መጠን ያረጋግጡ።",
+    "speak": "በድምፅ ይመልሱ",
+    "listening": "በማዳመጥ ላይ... አሁን ይናገሩ",
+    "back": "ተመለስ (*)",
+    "next": "ቀጥል",
+    "finish": "ምዝገባውን ጨርስ",
+    "repeatHint": "ለመድገም # ይጫኑ፣ ለመመለስ * ይጫኑ",
+    "offlineBanner": "በስልክዎ ላይ ተቀምጧል። ኢንተርኔት ሲገኝ ይላካል።",
+    "stepProgress": "ጥያቄ {step} ከ {of}",
+    "steps": {
+      "lang": {
+        "heading": "ቋንቋዎን ይምረጡ",
+        "options": [
+          "አማርኛ",
+          "English"
+        ]
+      },
+      "name": {
+        "heading": "ሙሉ ስምዎ ማን ነው?",
+        "label": "ሙሉ ስም",
+        "error": "እባክዎ ስምዎን ያስገቡ ወይም በድምፅ ይናገሩ።",
+        "voiceSaved": "የድምፅ ቅጂዎ እንደ ተጨማሪ ማረጋገጫ ተቀምጧል።"
+      },
+      "phone": {
+        "heading": "ስልክ ቁጥርዎ ስንት ነው?",
+        "label": "ስልክ ቁጥር (09..., 07..., ወይም +251...)",
+        "error": "እባክዎ ትክክለኛ የኢትዮጵያ ስልክ ቁጥር ያስገቡ።"
+      },
+      "idRoute": {
+        "heading": "ማንነትዎን እንዴት ማረጋገጥ ይፈልጋሉ?",
+        "options": [
+          "ብሔራዊ መታወቂያ (ፋይዳ)",
+          "የስደተኞች መታወቂያ",
+          "ሌላ ሰነድ",
+          "ምንም ሰነድ የለኝም፣ በአጋር ድርጅት በኩል ይላኩኝ"
+        ]
+      },
+      "support": {
+        "heading": "በትምህርትዎ ምን አይነት ድጋፍ ይፈልጋሉ? (አማራጭ)",
+        "note": "በስልክዎ ላይ በሚስጥር ይቀመጣል። ለቀጣሪዎች በፍፁም አይታይም።",
+        "options": [
+          "የጽሑፍ መግለጫ (Captions)",
+          "የምልክት ቋንቋ (EthSL)",
+          "የስክሪን አንባቢ ድጋፍ",
+          "ትልቅ ጽሑፍ",
+          "አስተርጓሚ",
+          "ተጨማሪ ጊዜ",
+          "መናገር አልፈልግም"
+        ]
+      }
+    },
+    "done": {
+      "heading": "ምዝገባዎ በተሳካ ሁኔታ ተጠናቋል!",
+      "referralMsg": "ጊዜያዊ የአጋር ድርጅት መለያ ቁጥር፡",
+      "reset": "እንደገና ጀምር / አስተካክል"
+    }
+  },
+  "en": {
+    "title": "Birtat Accessible Sign-Up",
+    "keypadOn": "Keypad Mode: ON",
+    "keypadOff": "Keypad Mode (1-2-3)",
+    "sunlight": "Sunlight Contrast",
+    "listen": "Listen",
+    "audioUnavailable": "Audio could not play. Check your device volume and audio settings.",
+    "speak": "Speak Answer",
+    "listening": "Listening... Speak now",
+    "back": "Back (*)",
+    "next": "Continue",
+    "finish": "Complete Registration",
+    "repeatHint": "Press # to repeat, * for back",
+    "offlineBanner": "Saved on this phone. It will send when you are online.",
+    "stepProgress": "Question {step} of {of}",
+    "steps": {
+      "lang": {
+        "heading": "Choose your language",
+        "options": [
+          "Amharic (አማርኛ)",
+          "English"
+        ]
+      },
+      "name": {
+        "heading": "What is your full name?",
+        "label": "Full name",
+        "error": "Please enter or speak your name.",
+        "voiceSaved": "Voice recording attached as backup."
+      },
+      "phone": {
+        "heading": "What is your phone number?",
+        "label": "Phone number (09..., 07..., or +251...)",
+        "error": "Please enter a valid Ethiopian phone number."
+      },
+      "idRoute": {
+        "heading": "How would you like to verify your identity?",
+        "options": [
+          "National ID (Fayda)",
+          "Refugee ID",
+          "Other Document",
+          "I have no document, refer me through a partner"
+        ]
+      },
+      "support": {
+        "heading": "What support helps you learn best? (Optional)",
+        "note": "Saved privately on your device. Never shared with employers.",
+        "options": [
+          "Captions",
+          "Sign language (EthSL)",
+          "Screen reader support",
+          "Large text",
+          "Interpreter",
+          "More time",
+          "Prefer not to say"
+        ]
+      }
+    },
+    "done": {
+      "heading": "Registration Complete!",
+      "referralMsg": "Provisional Partner Referral Code:",
+      "reset": "Start Over / Edit"
+    }
+  }
+};
+// END GENERATED TRANSLATIONS
 const NUM_KEYS = '123456789'.split('').map(Number);
 
 
@@ -23,13 +153,23 @@ class DbSignup extends HTMLElement {
     this.sunlightMode = false;
     this.errorMsg = '';
     this.isRecording = false;
+    this.promptAudio = null;
     this.onKeyDown = this.handleGlobalKey.bind(this);
   }
 
   loadState() {
     try {
       const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
-      if (saved && saved.profile) return saved;
+      if (saved && saved.profile) {
+        this.hasSavedState = true;
+        if (Array.isArray(saved.support)) {
+          saved.support = saved.support.map((item) => {
+            const index = TRANSLATIONS.am.steps.support.options.indexOf(item);
+            return index >= 0 ? TRANSLATIONS.en.steps.support.options[index] : item;
+          });
+        }
+        return saved;
+      }
     } catch (_) {}
     return {
       step: 0,
@@ -46,7 +186,7 @@ class DbSignup extends HTMLElement {
 
   async connectedCallback() {
     const attrLang = this.getAttribute('lang');
-    if (attrLang === 'en' || attrLang === 'am') {
+    if (!this.hasSavedState && (attrLang === 'en' || attrLang === 'am')) {
       this.state.profile.language = attrLang;
     }
     window.addEventListener('keydown', this.onKeyDown);
@@ -57,33 +197,55 @@ class DbSignup extends HTMLElement {
 
   disconnectedCallback() {
     window.removeEventListener('keydown', this.onKeyDown);
+    if (this.promptAudio) this.promptAudio.pause();
   }
 
   async loadTranslations(lang) {
-    try {
-      const res = await fetch(SCRIPT_BASE + 'i18n/' + lang + '.json');
-      this.dict = await res.json();
-    } catch (err) {
-      console.error('Failed to load language file:', err);
-    }
+    this.dict = TRANSLATIONS[lang] || TRANSLATIONS.am;
   }
 
   vibrate(pattern) {
     if (navigator.vibrate) navigator.vibrate(pattern);
   }
 
-  speak(text) {
-    if (!('speechSynthesis' in window)) return;
-    window.speechSynthesis.cancel();
+  speechError() {
+    const status = this.shadowRoot.querySelector('#audio-status');
+    if (status) status.textContent = this.dict.audioUnavailable;
+  }
+
+  speak(text, promptKey) {
+    if (this.promptAudio) this.promptAudio.pause();
+    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+    if (this.state.profile.language === 'am' && promptKey) {
+      this.promptAudio = new Audio(SCRIPT_BASE + 'audio/am/' + promptKey + '.mp3');
+      this.promptAudio.onerror = () => this.speechError();
+      this.promptAudio.play().catch(() => this.speechError());
+      return;
+    }
+    if (!('speechSynthesis' in window)) {
+      this.speechError();
+      return;
+    }
+    if (this.state.profile.language === 'am') {
+      const voice = window.speechSynthesis.getVoices().find((item) => item.lang.toLowerCase().startsWith('am'));
+      if (!voice) {
+        this.speechError();
+        return;
+      }
+    }
     const utter = new SpeechSynthesisUtterance(text);
     utter.lang = this.state.profile.language === 'am' ? 'am-ET' : 'en-US';
+    if (this.state.profile.language === 'am') {
+      utter.voice = window.speechSynthesis.getVoices().find((item) => item.lang.toLowerCase().startsWith('am'));
+    }
+    utter.onerror = () => this.speechError();
     window.speechSynthesis.speak(utter);
   }
 
   normalizePhone(raw) {
     const clean = raw.replace(/[\s-]/g, '');
-    if (/^0\d{8}$/.test(clean)) return '+251' + clean.slice(1);
-    if (/^\+251\d{8}$/.test(clean)) return clean;
+    if (/^0[79]\d{8}$/.test(clean)) return '+251' + clean.slice(1);
+    if (/^\+251[79]\d{8}$/.test(clean)) return clean;
     return null;
   }
 
@@ -114,7 +276,13 @@ class DbSignup extends HTMLElement {
       this.vibrate(50);
       const choice = stepData.options[num - 1];
       if (current === 'lang') {
+        if (this.promptAudio) this.promptAudio.pause();
         const nextLang = num === 1 ? 'am' : 'en';
+        const oldOptions = this.dict.steps.idRoute.options;
+        const routeIndex = oldOptions.indexOf(this.state.profile.idRoute);
+        if (routeIndex >= 0) {
+          this.state.profile.idRoute = TRANSLATIONS[nextLang].steps.idRoute.options[routeIndex];
+        }
         this.state.profile.language = nextLang;
         this.loadTranslations(nextLang).then(() => this.nextStep());
         return;
@@ -138,6 +306,8 @@ class DbSignup extends HTMLElement {
   }
 
   toggleSupport(item) {
+    const index = this.dict.steps.support.options.indexOf(item);
+    if (index >= 0) item = TRANSLATIONS.en.steps.support.options[index];
     const idx = this.state.support.indexOf(item);
     if (idx > -1) this.state.support.splice(idx, 1);
     else this.state.support.push(item);
@@ -154,7 +324,7 @@ class DbSignup extends HTMLElement {
       speech += s.options.map((opt, i) => (i + 1) + ': ' + opt).join('. ');
       if (current === 'support') speech += '. 9: ' + this.dict.finish;
     }
-    this.speak(speech);
+    this.speak(speech, current);
   }
 
   startVoiceInput(field) {
@@ -254,7 +424,8 @@ class DbSignup extends HTMLElement {
   }
 
   finishRegistration() {
-    if (this.state.profile.idRoute.includes('no document') || this.state.profile.idRoute.includes('ምንም ሰነድ')) {
+    if (this.state.profile.idRoute === TRANSLATIONS.en.steps.idRoute.options[3] ||
+        this.state.profile.idRoute === TRANSLATIONS.am.steps.idRoute.options[3]) {
       this.state.profile.referralCode = 'DB-' + Math.floor(1000 + Math.random() * 9000);
     }
     this.state.completed = true;
@@ -277,7 +448,7 @@ class DbSignup extends HTMLElement {
 
     this.syncOfflineQueue();
     this.render(true);
-    this.speak(this.dict.done.heading);
+    this.speak(this.dict.done.heading, 'done');
   }
 
   async syncOfflineQueue() {
@@ -331,6 +502,7 @@ class DbSignup extends HTMLElement {
       '.keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: .5rem; margin-top: 1rem; padding-top: 1rem; border-top: 2px dashed #888; }',
       '.keypad button { min-height: 58px; font-size: 1.35rem; }',
       '.error { color: ' + (this.sunlightMode ? '#ff6b6b' : '#b00020') + '; font-weight: 700; }',
+      '#audio-status:empty { display: none; }',
       '.offline { background: #fff3cd; color: #5c4500; padding: .6rem; border-radius: 6px; margin-bottom: .75rem; }',
       '.nav { display: flex; justify-content: space-between; gap: .75rem; margin-top: 1.25rem; }',
       '.pass-box { padding: 1rem; border: 2px dashed currentColor; border-radius: 8px; margin: 1rem 0; font-size: 1.2rem; }',
@@ -347,7 +519,7 @@ class DbSignup extends HTMLElement {
       '<button type="button" id="btn-keypad" class="' + (this.keypadMode ? 'primary' : '') + '" aria-pressed="' + this.keypadMode + '">' + ICONS.pad + ' ' + (this.keypadMode ? this.dict.keypadOn : this.dict.keypadOff) + '</button>' +
       '<button type="button" id="btn-sun" aria-pressed="' + this.sunlightMode + '">' + ICONS.sun + ' ' + this.dict.sunlight + '</button>' +
       listenBtn +
-      '</div>' + mainHtml + '</div>';
+      '</div><p id="audio-status" role="status"></p>' + mainHtml + '</div>';
 
     this.bindEvents(current);
     if (focusHeading) {
@@ -363,7 +535,7 @@ class DbSignup extends HTMLElement {
     if (s.options) {
       body = s.options.map((opt, idx) => {
         const selected = current === 'support'
-          ? this.state.support.includes(opt)
+          ? this.state.support.includes(TRANSLATIONS.en.steps.support.options[idx])
           : (current === 'lang' ? (idx === 0 && this.state.profile.language === 'am') || (idx === 1 && this.state.profile.language === 'en') : this.state.profile.idRoute === opt);
         return '<button type="button" class="option-btn ' + (selected ? 'primary' : '') + '" data-idx="' + idx + '" aria-pressed="' + selected + '"><span class="badge">' + (idx + 1) + '</span><span>' + opt + '</span></button>';
       }).join('');
