@@ -7,6 +7,7 @@ const ICONS = {
 };
 
 const STORAGE_KEY = 'db_signup_state_v1';
+const SCRIPT_BASE = document.currentScript ? new URL('.', document.currentScript.src).href : './';
 // BEGIN GENERATED TRANSLATIONS (run `node scripts/build-i18n.js` after editing JSON)
 const TRANSLATIONS = {
   "am": {
@@ -15,6 +16,7 @@ const TRANSLATIONS = {
     "keypadOff": "የቁጥር መደወያ (1-2-3)",
     "sunlight": "የፀሐይ ብርሃን ንፅፅር",
     "listen": "ያዳምጡ",
+    "audioUnavailable": "ድምፅ ማጫወት አልተቻለም። የመሣሪያዎን የድምፅ መጠን ያረጋግጡ።",
     "speak": "በድምፅ ይመልሱ",
     "listening": "በማዳመጥ ላይ... አሁን ይናገሩ",
     "back": "ተመለስ (*)",
@@ -77,6 +79,7 @@ const TRANSLATIONS = {
     "keypadOff": "Keypad Mode (1-2-3)",
     "sunlight": "Sunlight Contrast",
     "listen": "Listen",
+    "audioUnavailable": "Audio could not play. Check your device volume and audio settings.",
     "speak": "Speak Answer",
     "listening": "Listening... Speak now",
     "back": "Back (*)",
@@ -150,6 +153,7 @@ class DbSignup extends HTMLElement {
     this.sunlightMode = false;
     this.errorMsg = '';
     this.isRecording = false;
+    this.promptAudio = null;
     this.onKeyDown = this.handleGlobalKey.bind(this);
   }
 
@@ -193,6 +197,7 @@ class DbSignup extends HTMLElement {
 
   disconnectedCallback() {
     window.removeEventListener('keydown', this.onKeyDown);
+    if (this.promptAudio) this.promptAudio.pause();
   }
 
   async loadTranslations(lang) {
@@ -203,11 +208,37 @@ class DbSignup extends HTMLElement {
     if (navigator.vibrate) navigator.vibrate(pattern);
   }
 
-  speak(text) {
-    if (!('speechSynthesis' in window)) return;
-    window.speechSynthesis.cancel();
+  speechError() {
+    const status = this.shadowRoot.querySelector('#audio-status');
+    if (status) status.textContent = this.dict.audioUnavailable;
+  }
+
+  speak(text, promptKey) {
+    if (this.promptAudio) this.promptAudio.pause();
+    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+    if (this.state.profile.language === 'am' && promptKey) {
+      this.promptAudio = new Audio(SCRIPT_BASE + 'audio/am/' + promptKey + '.mp3');
+      this.promptAudio.onerror = () => this.speechError();
+      this.promptAudio.play().catch(() => this.speechError());
+      return;
+    }
+    if (!('speechSynthesis' in window)) {
+      this.speechError();
+      return;
+    }
+    if (this.state.profile.language === 'am') {
+      const voice = window.speechSynthesis.getVoices().find((item) => item.lang.toLowerCase().startsWith('am'));
+      if (!voice) {
+        this.speechError();
+        return;
+      }
+    }
     const utter = new SpeechSynthesisUtterance(text);
     utter.lang = this.state.profile.language === 'am' ? 'am-ET' : 'en-US';
+    if (this.state.profile.language === 'am') {
+      utter.voice = window.speechSynthesis.getVoices().find((item) => item.lang.toLowerCase().startsWith('am'));
+    }
+    utter.onerror = () => this.speechError();
     window.speechSynthesis.speak(utter);
   }
 
@@ -245,6 +276,7 @@ class DbSignup extends HTMLElement {
       this.vibrate(50);
       const choice = stepData.options[num - 1];
       if (current === 'lang') {
+        if (this.promptAudio) this.promptAudio.pause();
         const nextLang = num === 1 ? 'am' : 'en';
         const oldOptions = this.dict.steps.idRoute.options;
         const routeIndex = oldOptions.indexOf(this.state.profile.idRoute);
@@ -292,7 +324,7 @@ class DbSignup extends HTMLElement {
       speech += s.options.map((opt, i) => (i + 1) + ': ' + opt).join('. ');
       if (current === 'support') speech += '. 9: ' + this.dict.finish;
     }
-    this.speak(speech);
+    this.speak(speech, current);
   }
 
   startVoiceInput(field) {
@@ -416,7 +448,7 @@ class DbSignup extends HTMLElement {
 
     this.syncOfflineQueue();
     this.render(true);
-    this.speak(this.dict.done.heading);
+    this.speak(this.dict.done.heading, 'done');
   }
 
   async syncOfflineQueue() {
@@ -470,6 +502,7 @@ class DbSignup extends HTMLElement {
       '.keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: .5rem; margin-top: 1rem; padding-top: 1rem; border-top: 2px dashed #888; }',
       '.keypad button { min-height: 58px; font-size: 1.35rem; }',
       '.error { color: ' + (this.sunlightMode ? '#ff6b6b' : '#b00020') + '; font-weight: 700; }',
+      '#audio-status:empty { display: none; }',
       '.offline { background: #fff3cd; color: #5c4500; padding: .6rem; border-radius: 6px; margin-bottom: .75rem; }',
       '.nav { display: flex; justify-content: space-between; gap: .75rem; margin-top: 1.25rem; }',
       '.pass-box { padding: 1rem; border: 2px dashed currentColor; border-radius: 8px; margin: 1rem 0; font-size: 1.2rem; }',
@@ -486,7 +519,7 @@ class DbSignup extends HTMLElement {
       '<button type="button" id="btn-keypad" class="' + (this.keypadMode ? 'primary' : '') + '" aria-pressed="' + this.keypadMode + '">' + ICONS.pad + ' ' + (this.keypadMode ? this.dict.keypadOn : this.dict.keypadOff) + '</button>' +
       '<button type="button" id="btn-sun" aria-pressed="' + this.sunlightMode + '">' + ICONS.sun + ' ' + this.dict.sunlight + '</button>' +
       listenBtn +
-      '</div>' + mainHtml + '</div>';
+      '</div><p id="audio-status" role="status"></p>' + mainHtml + '</div>';
 
     this.bindEvents(current);
     if (focusHeading) {
