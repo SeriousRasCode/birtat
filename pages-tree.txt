@@ -1,0 +1,15 @@
+﻿
+
+    Directory: 
+    C:\Users\Home\Desktop\alx\Savanna-static-pages\pages
+
+
+Mode          LastWriteTime Length Name                     
+----          ------------- ------ ----                     
+-a---- 11/14/2026   2:30 PM  66045 concept-with-navigation.h
+                                   tml                      
+-a---- 11/14/2026   2:30 PM 637518 homepage-v1-paced.html   
+-a---- 11/14/2026   2:30 PM  76262 homepage-v1-self-paced.ht
+                                   ml                       
+
+

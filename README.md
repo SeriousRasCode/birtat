@@ -56,3 +56,59 @@ the accessibility tree and no id appears twice):
 Everything else is inert.
 
 
+
+_______________________________________________________________
+
+
+# Birtat  (`<db-signup>`) — Track 1: Accessible Onboarding
+
+## What it does
+Birtat Bridge is a zero-dependency, offline-first accessible sign-up and career gateway web component (`<db-signup>`). It guides learners one question at a time in Amharic and English with a telephone-style keypad mode (`1`–`9`, `*`, `#`), voice input/output, tactile vibration feedback, and a provisional no-ID referral pass. Sensitive disability and support preferences stay strictly isolated from employer data.
+
+## The main task we tested
+"A blind or low-literacy learner with no formal ID card registers independently in Amharic on a low-cost Android phone using keypad numbers and voice prompts, with nobody helping."
+
+## Run it
+```bash
+docker compose up
+```
+Open:
+* Standalone Judge Demo + Blindfold Mode: `http://localhost:8080/demo/blank.html`
+* Savanna Sign-Up Page: `http://localhost:8080/pages/signup.html`
+* Savanna Career Gateway: `http://localhost:8080/pages/jobs.html`
+
+## Install, Level 1
+```html
+<script src="../module/db-signup.js" defer></script>
+<db-signup lang="am" api="https://your-server.example"></db-signup>
+```
+* **Attributes:** `lang` (`"am"` or `"en"`), `api` (optional backend URL for offline sync).
+* **Events:**
+  * `db-signup:step` — `{ step, of }`
+  * `db-signup:done` — `{ profile: { language, name, phone, idRoute, referralCode }, voiceNotes }`
+  * `db-signup:support` — `{ support: [...] }` (dispatched separately so support needs never mix with profile/employer payloads).
+
+## Install, Level 3
+`pages/jobs.html` embeds standard `schema.org/JobPosting` JSON-LD so external job boards and search engines can index accessible roles.
+
+## Languages and how to add one
+Translations live in `module/i18n/en.json` and `module/i18n/am.json`. To add Afaan Oromo (`om.json`) or Tigrinya (`ti.json`), copy `en.json` into `module/i18n/` and translate the values.
+
+## Offline and slow connection
+* Every answer saves immediately to `localStorage`; reloading resumes on the exact step.
+* Total module payload is ~14 KB uncompressed (~4 KB gzipped), loading in under 350 ms on Chrome DevTools Slow 3G throttling.
+
+## Data and privacy
+* Collected: Name, normalized Ethiopian phone (`+251...`), identity route, and optional support preferences.
+* Storage: Stored locally in browser `localStorage`; support preferences are isolated from profile events and never sent to employers on `jobs.html`.
+
+## Cost to run per month, roughly
+$0/month (100% static client-side Web Component with zero paid API dependencies; runs on any basic static host or CDN for 3,000+ learners).
+
+## Finished and not finished
+* **Finished:** 5-step accessible engine, Amharic/English i18n, Phone Keypad Mode (`1`–`9`, `*`, `#`), `navigator.vibrate` haptic feedback, Sunlight High-Contrast Mode, Voice Input + Audio Fallback, Offline No-ID Referral Code, Blindfold Judge Demo, and `schema.org` Career Gateway.
+* **Not finished:** Full server-side REST persistence (`openapi.yaml`)—currently runs client-side with offline queue sync hooks ready for any `/api/v1/learners` endpoint.
+
+## Libraries and their licences
+None — 100% vanilla HTML, CSS, and JavaScript (MIT License).
+

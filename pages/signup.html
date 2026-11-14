@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="am">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ALX Savanna — Accessible Sign-Up</title>
+  <link rel="stylesheet" href="../assets/css/application_alx.css">
+  <link rel="stylesheet" href="../assets/css/app.css">
+  <script src="../module/db-signup.js" defer></script>
+</head>
+<body style="background: #f8f9fa; min-height: 100vh;">
+  <header style="background: #ffffff; border-bottom: 1px solid #e0e0e0; padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+    <strong style="font-size: 1.25rem; color: #002b56;">ALX Savanna</strong>
+    <a href="homepage-v1-paced.html" style="color: #002b56; font-weight: 600;">Dashboard →</a>
+  </header>
+
+  <main style="padding: 2rem 1rem;">
+    <db-signup lang="am"></db-signup>
+  </main>
+
+  <script>
+    document.addEventListener('db-signup:done', () => {
+      setTimeout(() => { window.location.href = 'homepage-v1-paced.html'; }, 2500);
+    });
+  </script>
+</body>
+</html>

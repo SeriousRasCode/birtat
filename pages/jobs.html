@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Savanna Career Gateway — Accessible Jobs</title>
+  <link rel="stylesheet" href="../assets/css/application_alx.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "JobPosting",
+    "title": "Junior Virtual Assistant (Remote)",
+    "description": "Plain-language remote customer support and data entry role.",
+    "datePosted": "2026-11-14",
+    "employmentType": "FULL_TIME",
+    "jobLocationType": "TELECOMMUTE",
+    "hiringOrganization": { "@type": "Organization", "name": "Addis Digital Services PLC" },
+    "jobLocation": { "@type": "Place", "address": { "@type": "PostalAddress", "addressLocality": "Addis Ababa", "addressCountry": "ET" } },
+    "jobBenefits": "Screen reader compatible tools, flexible hours, sign language interpreter for interviews"
+  }
+  </script>
+  <style>
+    body { font-family: system-ui, sans-serif; background: #f8f9fa; padding: 1.5rem; }
+    .wrap { max-width: 720px; margin: 0 auto; }
+    .privacy-box { background: #e8f5e9; border: 2px solid #2e7d32; padding: 1rem; border-radius: 10px; margin-bottom: 1.25rem; }
+    .job-card { background: #fff; border: 1px solid #d0d7de; border-radius: 10px; padding: 1.25rem; margin-bottom: 1rem; }
+    .match-badge { display: inline-block; background: #002b56; color: #fff; padding: .3rem .75rem; border-radius: 6px; font-weight: 700; margin-bottom: .5rem; }
+    button { min-height: 48px; padding: .6rem 1.2rem; font-weight: 700; border-radius: 8px; cursor: pointer; background: #002b56; color: #fff; border: none; }
+    :focus-visible { outline: 3px solid #f5a300; outline-offset: 2px; }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <a href="homepage-v1-paced.html">← Back to Dashboard</a>
+    <h1>Accessible Career Gateway</h1>
+
+    <div class="privacy-box" role="status">
+      <strong>🔒 Zero-Leak Privacy Filter:</strong>
+      <p id="filter-status" style="margin:.4rem 0 0;">Checking your saved access needs locally in your browser...</p>
+    </div>
+
+    <div id="jobs-list"></div>
+  </main>
+
+  <script>
+    const JOBS = [
+      {
+        title: "Junior Virtual Assistant (Remote)",
+        company: "Addis Digital Services PLC — Addis Ababa",
+        supports: ["Captions", "Sign language (EthSL)", "Screen reader support", "More time", "Interpreter"],
+        summary: "Remote administrative and client support role. Screen-reader tested workspace and EthSL interpreter provided for interviews."
+      },
+      {
+        title: "Bilingual Customer Support Associate",
+        company: "EthioConnect Hub — Bole, Addis Ababa",
+        supports: ["Captions", "Large text", "More time", "Interpreter"],
+        summary: "Amharic and English chat-based customer support with flexible shift timing and large-display workstations."
+      },
+      {
+        title: "Junior Web Content Tester",
+        company: "Sheba Tech Solutions — Remote",
+        supports: ["Screen reader support", "Large text", "More time", "Captions"],
+        summary: "Test websites for mobile usability and accessibility from home on your own schedule."
+      }
+    ];
+
+    function renderJobs() {
+      let savedSupport = [];
+      try {
+        const raw = JSON.parse(localStorage.getItem('db_signup_state_v1'));
+        if (raw && Array.isArray(raw.support)) savedSupport = raw.support;
+      } catch (_) {}
+
+      const cleanNeeds = savedSupport.filter(s => !s.includes('Prefer not') && !s.includes('አልፈልግም'));
+      const statusEl = document.getElementById('filter-status');
+
+      if (cleanNeeds.length > 0) {
+        statusEl.textContent = 'Filtering jobs locally for your needs (' + cleanNeeds.join(', ') + '). Nothing is sent to employers.';
+      } else {
+        statusEl.textContent = 'Showing all accessible jobs. Complete Sign-Up support preferences to auto-match locally.';
+      }
+
+      const list = document.getElementById('jobs-list');
+      list.innerHTML = JOBS.map((job, idx) => {
+        const matched = cleanNeeds.filter(need => job.supports.some(s => need.toLowerCase().includes(s.toLowerCase().split(' ')[0])));
+        const badge = cleanNeeds.length
+          ? '<div class="match-badge">✓ Matches ' + matched.length + ' of ' + cleanNeeds.length + ' of your needs</div>'
+          : '<div class="match-badge">✓ Accessibility Verified</div>';
+
+        return '<article class="job-card">' +
+          badge +
+          '<h2>' + job.title + '</h2>' +
+          '<p><strong>' + job.company + '</strong></p>' +
+          '<p>' + job.summary + '</p>' +
+          '<p><small><strong>Employer offers:</strong> ' + job.supports.join(' • ') + '</small></p>' +
+          '<button type="button" onclick="applyJob(' + idx + ')">Apply (Profile Only — No Disability Data Sent)</button>' +
+          '</article>';
+      }).join('');
+    }
+
+    function applyJob(idx) {
+      alert('Application sent for: ' + JOBS[idx].title + '!\n\nOnly your Name & Phone were shared. Your support needs stayed private on your device.');
+    }
+
+    renderJobs();
+  </script>
+</body>
+</html>

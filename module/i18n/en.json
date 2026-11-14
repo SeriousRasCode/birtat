@@ -1,0 +1,59 @@
+{
+  "title": "Birtat Accessible Sign-Up",
+  "keypadOn": "Keypad Mode: ON",
+  "keypadOff": "Keypad Mode (1-2-3)",
+  "sunlight": "Sunlight Contrast",
+  "listen": "Listen",
+  "speak": "Speak Answer",
+  "listening": "Listening... Speak now",
+  "back": "Back (*)",
+  "next": "Continue",
+  "finish": "Complete Registration",
+  "repeatHint": "Press # to repeat, * for back",
+  "offlineBanner": "Saved on this phone. It will send when you are online.",
+  "stepProgress": "Question {step} of {of}",
+  "steps": {
+    "lang": {
+      "heading": "Choose your language",
+      "options": ["Amharic (አማርኛ)", "English"]
+    },
+    "name": {
+      "heading": "What is your full name?",
+      "label": "Full name",
+      "error": "Please enter or speak your name.",
+      "voiceSaved": "Voice recording attached as backup."
+    },
+    "phone": {
+      "heading": "What is your phone number?",
+      "label": "Phone number (09..., 07..., or +251...)",
+      "error": "Please enter a valid Ethiopian phone number."
+    },
+    "idRoute": {
+      "heading": "How would you like to verify your identity?",
+      "options": [
+        "National ID (Fayda)",
+        "Refugee ID",
+        "Other Document",
+        "I have no document, refer me through a partner"
+      ]
+    },
+    "support": {
+      "heading": "What support helps you learn best? (Optional)",
+      "note": "Saved privately on your device. Never shared with employers.",
+      "options": [
+        "Captions",
+        "Sign language (EthSL)",
+        "Screen reader support",
+        "Large text",
+        "Interpreter",
+        "More time",
+        "Prefer not to say"
+      ]
+    }
+  },
+  "done": {
+    "heading": "Registration Complete!",
+    "referralMsg": "Provisional Partner Referral Code:",
+    "reset": "Start Over / Edit"
+  }
+}

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Birtat Bridge Demo</title>
+  <script src="../module/db-signup.js" defer></script>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 1rem; background: #f6f8fa; }
+    .judge-bar {
+      max-width: 540px; margin: 0 auto 1rem; padding: .75rem;
+      background: #111; color: #fff; border-radius: 8px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .judge-bar button {
+      min-height: 44px; padding: .5rem 1rem; font-weight: bold;
+      background: #f5a300; color: #000; border: none; border-radius: 6px; cursor: pointer;
+    }
+    #curtain {
+      display: none; position: fixed; inset: 0; background: #000; color: #fff;
+      z-index: 9999; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center; padding: 2rem; pointer-events: none;
+    }
+    body.blindfold #curtain { display: flex; }
+    #exit-curtain {
+      display: none; position: fixed; top: 1rem; right: 1rem; z-index: 10000;
+      min-height: 48px; padding: .6rem 1rem; background: #222; color: #fff; border: 2px solid #fff;
+    }
+    body.blindfold #exit-curtain { display: block; }
+    pre { max-width: 540px; margin: 1rem auto; background: #fff; padding: 1rem; border-radius: 8px; overflow-x: auto; }
+  </style>
+</head>
+<body>
+  <div class="judge-bar">
+    <span>Judge Demo Controls</span>
+    <button type="button" id="toggle-curtain">Turn On Black Screen Mode</button>
+  </div>
+
+  <div id="curtain" aria-hidden="true">
+    <h1>Black Screen (Blindfold) Mode Active</h1>
+    <p>Use keyboard numbers (1-9, *, #) or voice prompts to register without seeing the screen.</p>
+  </div>
+  <button type="button" id="exit-curtain">Exit Black Screen</button>
+
+  <main>
+    <db-signup lang="am"></db-signup>
+  </main>
+
+  <pre id="event-log" aria-live="off">Waiting for privacy-separated events...</pre>
+
+  <script>
+    const log = document.getElementById('event-log');
+    document.getElementById('toggle-curtain').onclick = () => document.body.classList.add('blindfold');
+    document.getElementById('exit-curtain').onclick = () => document.body.classList.remove('blindfold');
+
+    document.addEventListener('db-signup:done', (e) => {
+      log.textContent = '1. PROFILE EVENT (Public):\n' + JSON.stringify(e.detail, null, 2) + '\n\n' + log.textContent;
+    });
+    document.addEventListener('db-signup:support', (e) => {
+      log.textContent = '2. SUPPORT EVENT (Private/Isolated):\n' + JSON.stringify(e.detail, null, 2) + '\n\n' + log.textContent;
+    });
+  </script>
+</body>
+</html>
