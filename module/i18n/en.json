@@ -4,6 +4,7 @@
   "keypadOff": "Keypad Mode (1-2-3)",
   "sunlight": "Sunlight Contrast",
   "listen": "Listen",
+  "audioUnavailable": "Audio could not play. Check your device volume and audio settings.",
   "speak": "Speak Answer",
   "listening": "Listening... Speak now",
   "back": "Back (*)",
