@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<script src="../module/db-signup.js"></script>
+<pre id="result">RUNNING</pre>
+<script>
+  (async () => {
+    const result = document.getElementById('result');
+    localStorage.removeItem('db_signup_state_v1');
+    let component = document.createElement('db-signup');
+    component.setAttribute('lang', 'am');
+    document.body.insertBefore(component, result);
+    const check = (condition, message) => { if (!condition) throw new Error(message); };
+    const click = (selector) => {
+      const button = component.shadowRoot.querySelector(selector);
+      check(button, 'Missing control: ' + selector + ' at step ' + component.state.step + ' (' + component.errorMsg + ')');
+      button.click();
+    };
+    try {
+      await new Promise(resolve => setTimeout(resolve, 0));
+      check(component.shadowRoot.textContent.includes('ቋንቋዎን ይምረጡ'), 'Amharic did not load');
+      click('[data-idx="1"]');
+      await new Promise(resolve => setTimeout(resolve, 0));
+      check(component.state.profile.language === 'en', 'English selection failed');
+      component.remove();
+      component = document.createElement('db-signup');
+      component.setAttribute('lang', 'am');
+      document.body.insertBefore(component, result);
+      await new Promise(resolve => setTimeout(resolve, 0));
+      check(component.state.profile.language === 'en', 'Saved language was overwritten');
+      click('#btn-back');
+      click('[data-idx="0"]');
+      await Promise.resolve();
+      check(component.shadowRoot.textContent.includes('ሙሉ ስምዎ'), 'Amharic switch failed');
+      const name = component.shadowRoot.querySelector('input');
+      name.value = 'ሳራ ተስፋዬ';
+      name.dispatchEvent(new Event('input', { bubbles: true }));
+      click('[type="submit"]');
+      const phone = component.shadowRoot.querySelector('input');
+      phone.value = '0912345678';
+      phone.dispatchEvent(new Event('input', { bubbles: true }));
+      click('[type="submit"]');
+      click('[data-idx="3"]');
+      click('[data-idx="0"]');
+      check(component.state.support.includes('Captions'), 'Amharic support choice was not saved for job matching');
+      click('[type="submit"]');
+      check(component.state.completed, 'Registration did not complete');
+      check(component.state.profile.referralCode.startsWith('DB-'), 'Amharic no-document referral missing');
+      result.textContent = 'PASS: Amharic, switching, saved language, support matching, and no-document referral';
+    } catch (error) {
+      result.textContent = 'FAIL: ' + error.message;
+    }
+  })();
+</script>

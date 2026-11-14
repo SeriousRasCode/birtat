@@ -7,7 +7,134 @@ const ICONS = {
 };
 
 const STORAGE_KEY = 'db_signup_state_v1';
-const SCRIPT_BASE = document.currentScript ? new URL('.', document.currentScript.src).href : './';
+// BEGIN GENERATED TRANSLATIONS (run `node scripts/build-i18n.js` after editing JSON)
+const TRANSLATIONS = {
+  "am": {
+    "title": "ብርታት ተደራሽ ምዝገባ",
+    "keypadOn": "የቁጥር መደወያ፡ በርቷል",
+    "keypadOff": "የቁጥር መደወያ (1-2-3)",
+    "sunlight": "የፀሐይ ብርሃን ንፅፅር",
+    "listen": "ያዳምጡ",
+    "speak": "በድምፅ ይመልሱ",
+    "listening": "በማዳመጥ ላይ... አሁን ይናገሩ",
+    "back": "ተመለስ (*)",
+    "next": "ቀጥል",
+    "finish": "ምዝገባውን ጨርስ",
+    "repeatHint": "ለመድገም # ይጫኑ፣ ለመመለስ * ይጫኑ",
+    "offlineBanner": "በስልክዎ ላይ ተቀምጧል። ኢንተርኔት ሲገኝ ይላካል።",
+    "stepProgress": "ጥያቄ {step} ከ {of}",
+    "steps": {
+      "lang": {
+        "heading": "ቋንቋዎን ይምረጡ",
+        "options": [
+          "አማርኛ",
+          "English"
+        ]
+      },
+      "name": {
+        "heading": "ሙሉ ስምዎ ማን ነው?",
+        "label": "ሙሉ ስም",
+        "error": "እባክዎ ስምዎን ያስገቡ ወይም በድምፅ ይናገሩ።",
+        "voiceSaved": "የድምፅ ቅጂዎ እንደ ተጨማሪ ማረጋገጫ ተቀምጧል።"
+      },
+      "phone": {
+        "heading": "ስልክ ቁጥርዎ ስንት ነው?",
+        "label": "ስልክ ቁጥር (09..., 07..., ወይም +251...)",
+        "error": "እባክዎ ትክክለኛ የኢትዮጵያ ስልክ ቁጥር ያስገቡ።"
+      },
+      "idRoute": {
+        "heading": "ማንነትዎን እንዴት ማረጋገጥ ይፈልጋሉ?",
+        "options": [
+          "ብሔራዊ መታወቂያ (ፋይዳ)",
+          "የስደተኞች መታወቂያ",
+          "ሌላ ሰነድ",
+          "ምንም ሰነድ የለኝም፣ በአጋር ድርጅት በኩል ይላኩኝ"
+        ]
+      },
+      "support": {
+        "heading": "በትምህርትዎ ምን አይነት ድጋፍ ይፈልጋሉ? (አማራጭ)",
+        "note": "በስልክዎ ላይ በሚስጥር ይቀመጣል። ለቀጣሪዎች በፍፁም አይታይም።",
+        "options": [
+          "የጽሑፍ መግለጫ (Captions)",
+          "የምልክት ቋንቋ (EthSL)",
+          "የስክሪን አንባቢ ድጋፍ",
+          "ትልቅ ጽሑፍ",
+          "አስተርጓሚ",
+          "ተጨማሪ ጊዜ",
+          "መናገር አልፈልግም"
+        ]
+      }
+    },
+    "done": {
+      "heading": "ምዝገባዎ በተሳካ ሁኔታ ተጠናቋል!",
+      "referralMsg": "ጊዜያዊ የአጋር ድርጅት መለያ ቁጥር፡",
+      "reset": "እንደገና ጀምር / አስተካክል"
+    }
+  },
+  "en": {
+    "title": "Birtat Accessible Sign-Up",
+    "keypadOn": "Keypad Mode: ON",
+    "keypadOff": "Keypad Mode (1-2-3)",
+    "sunlight": "Sunlight Contrast",
+    "listen": "Listen",
+    "speak": "Speak Answer",
+    "listening": "Listening... Speak now",
+    "back": "Back (*)",
+    "next": "Continue",
+    "finish": "Complete Registration",
+    "repeatHint": "Press # to repeat, * for back",
+    "offlineBanner": "Saved on this phone. It will send when you are online.",
+    "stepProgress": "Question {step} of {of}",
+    "steps": {
+      "lang": {
+        "heading": "Choose your language",
+        "options": [
+          "Amharic (አማርኛ)",
+          "English"
+        ]
+      },
+      "name": {
+        "heading": "What is your full name?",
+        "label": "Full name",
+        "error": "Please enter or speak your name.",
+        "voiceSaved": "Voice recording attached as backup."
+      },
+      "phone": {
+        "heading": "What is your phone number?",
+        "label": "Phone number (09..., 07..., or +251...)",
+        "error": "Please enter a valid Ethiopian phone number."
+      },
+      "idRoute": {
+        "heading": "How would you like to verify your identity?",
+        "options": [
+          "National ID (Fayda)",
+          "Refugee ID",
+          "Other Document",
+          "I have no document, refer me through a partner"
+        ]
+      },
+      "support": {
+        "heading": "What support helps you learn best? (Optional)",
+        "note": "Saved privately on your device. Never shared with employers.",
+        "options": [
+          "Captions",
+          "Sign language (EthSL)",
+          "Screen reader support",
+          "Large text",
+          "Interpreter",
+          "More time",
+          "Prefer not to say"
+        ]
+      }
+    },
+    "done": {
+      "heading": "Registration Complete!",
+      "referralMsg": "Provisional Partner Referral Code:",
+      "reset": "Start Over / Edit"
+    }
+  }
+};
+// END GENERATED TRANSLATIONS
 const NUM_KEYS = '123456789'.split('').map(Number);
 
 
@@ -29,7 +156,16 @@ class DbSignup extends HTMLElement {
   loadState() {
     try {
       const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
-      if (saved && saved.profile) return saved;
+      if (saved && saved.profile) {
+        this.hasSavedState = true;
+        if (Array.isArray(saved.support)) {
+          saved.support = saved.support.map((item) => {
+            const index = TRANSLATIONS.am.steps.support.options.indexOf(item);
+            return index >= 0 ? TRANSLATIONS.en.steps.support.options[index] : item;
+          });
+        }
+        return saved;
+      }
     } catch (_) {}
     return {
       step: 0,
@@ -46,7 +182,7 @@ class DbSignup extends HTMLElement {
 
   async connectedCallback() {
     const attrLang = this.getAttribute('lang');
-    if (attrLang === 'en' || attrLang === 'am') {
+    if (!this.hasSavedState && (attrLang === 'en' || attrLang === 'am')) {
       this.state.profile.language = attrLang;
     }
     window.addEventListener('keydown', this.onKeyDown);
@@ -60,12 +196,7 @@ class DbSignup extends HTMLElement {
   }
 
   async loadTranslations(lang) {
-    try {
-      const res = await fetch(SCRIPT_BASE + 'i18n/' + lang + '.json');
-      this.dict = await res.json();
-    } catch (err) {
-      console.error('Failed to load language file:', err);
-    }
+    this.dict = TRANSLATIONS[lang] || TRANSLATIONS.am;
   }
 
   vibrate(pattern) {
@@ -82,8 +213,8 @@ class DbSignup extends HTMLElement {
 
   normalizePhone(raw) {
     const clean = raw.replace(/[\s-]/g, '');
-    if (/^0\d{8}$/.test(clean)) return '+251' + clean.slice(1);
-    if (/^\+251\d{8}$/.test(clean)) return clean;
+    if (/^0[79]\d{8}$/.test(clean)) return '+251' + clean.slice(1);
+    if (/^\+251[79]\d{8}$/.test(clean)) return clean;
     return null;
   }
 
@@ -115,6 +246,11 @@ class DbSignup extends HTMLElement {
       const choice = stepData.options[num - 1];
       if (current === 'lang') {
         const nextLang = num === 1 ? 'am' : 'en';
+        const oldOptions = this.dict.steps.idRoute.options;
+        const routeIndex = oldOptions.indexOf(this.state.profile.idRoute);
+        if (routeIndex >= 0) {
+          this.state.profile.idRoute = TRANSLATIONS[nextLang].steps.idRoute.options[routeIndex];
+        }
         this.state.profile.language = nextLang;
         this.loadTranslations(nextLang).then(() => this.nextStep());
         return;
@@ -138,6 +274,8 @@ class DbSignup extends HTMLElement {
   }
 
   toggleSupport(item) {
+    const index = this.dict.steps.support.options.indexOf(item);
+    if (index >= 0) item = TRANSLATIONS.en.steps.support.options[index];
     const idx = this.state.support.indexOf(item);
     if (idx > -1) this.state.support.splice(idx, 1);
     else this.state.support.push(item);
@@ -254,7 +392,8 @@ class DbSignup extends HTMLElement {
   }
 
   finishRegistration() {
-    if (this.state.profile.idRoute.includes('no document') || this.state.profile.idRoute.includes('ምንም ሰነድ')) {
+    if (this.state.profile.idRoute === TRANSLATIONS.en.steps.idRoute.options[3] ||
+        this.state.profile.idRoute === TRANSLATIONS.am.steps.idRoute.options[3]) {
       this.state.profile.referralCode = 'DB-' + Math.floor(1000 + Math.random() * 9000);
     }
     this.state.completed = true;
@@ -363,7 +502,7 @@ class DbSignup extends HTMLElement {
     if (s.options) {
       body = s.options.map((opt, idx) => {
         const selected = current === 'support'
-          ? this.state.support.includes(opt)
+          ? this.state.support.includes(TRANSLATIONS.en.steps.support.options[idx])
           : (current === 'lang' ? (idx === 0 && this.state.profile.language === 'am') || (idx === 1 && this.state.profile.language === 'en') : this.state.profile.idRoute === opt);
         return '<button type="button" class="option-btn ' + (selected ? 'primary' : '') + '" data-idx="' + idx + '" aria-pressed="' + selected + '"><span class="badge">' + (idx + 1) + '</span><span>' + opt + '</span></button>';
       }).join('');
