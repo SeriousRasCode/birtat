@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<script src="../module/db-signup.js"></script>
+<pre id="result">RUNNING</pre>
+<script>
+  (async () => {
+    const result = document.getElementById('result');
+    localStorage.removeItem('db_signup_state_v1');
+    let component = document.createElement('db-signup');
+    component.setAttribute('lang', 'am');
+    document.body.insertBefore(component, result);
+    const check = (condition, message) => { if (!condition) throw new Error(message); };
+    const click = (selector) => {
+      const button = component.shadowRoot.querySelector(selector);
+      check(button, 'Missing control: ' + selector + ' at step ' + component.state.step + ' (' + component.errorMsg + ')');
+      button.click();
+    };
+    try {
+      await new Promise(resolve => setTimeout(resolve, 0));
+      check(component.shadowRoot.textContent.includes('ቋንቋዎን ይምረጡ'), 'Amharic did not load');
+      click('#btn-listen');
+      check(component.promptAudio.src.endsWith('/module/audio/am/lang.mp3'), 'Listen did not load the Amharic clip');
+      try {
+        await component.promptAudio.play();
+      } catch (error) {
+        if (error.name !== 'NotAllowedError') throw error; // Headless synthetic clicks have no user gesture.
+      }
+      if (location.protocol.startsWith('http')) {
+        for (const step of ['lang', 'name', 'phone', 'idRoute', 'support', 'done']) {
+          const response = await fetch('../module/audio/am/' + step + '.mp3');
+          check(response.ok, 'Missing Amharic audio: ' + step);
+          check((await response.arrayBuffer()).byteLength > 2000, 'Empty Amharic audio: ' + step);
+        }
+      }
+      click('[data-idx="1"]');
+      await new Promise(resolve => setTimeout(resolve, 0));
+      check(component.state.profile.language === 'en', 'English selection failed');
+      check(component.promptAudio.paused, 'Amharic audio kept playing after language switch');
+      component.remove();
+      component = document.createElement('db-signup');
+      component.setAttribute('lang', 'am');
+      document.body.insertBefore(component, result);
+      await new Promise(resolve => setTimeout(resolve, 0));
+      check(component.state.profile.language === 'en', 'Saved language was overwritten');
+      click('#btn-back');
+      click('[data-idx="0"]');
+      await Promise.resolve();
+      check(component.shadowRoot.textContent.includes('ሙሉ ስምዎ'), 'Amharic switch failed');
+      const name = component.shadowRoot.querySelector('input');
+      name.value = 'ሳራ ተስፋዬ';
+      name.dispatchEvent(new Event('input', { bubbles: true }));
+      click('[type="submit"]');
+      const phone = component.shadowRoot.querySelector('input');
+      phone.value = '0912345678';
+      phone.dispatchEvent(new Event('input', { bubbles: true }));
+      click('[type="submit"]');
+      click('[data-idx="3"]');
+      click('[data-idx="0"]');
+      check(component.state.support.includes('Captions'), 'Amharic support choice was not saved for job matching');
+      click('[type="submit"]');
+      check(component.state.completed, 'Registration did not complete');
+      check(component.state.profile.referralCode.startsWith('DB-'), 'Amharic no-document referral missing');
+      component.remove();
+      localStorage.removeItem('db_signup_state_v1');
+      component = document.createElement('db-signup');
+      component.setAttribute('lang', 'en');
+      document.body.insertBefore(component, result);
+      await new Promise(resolve => setTimeout(resolve, 0));
+      check(component.shadowRoot.textContent.includes('Choose your language'), 'English did not load');
+      click('#btn-listen');
+      check(component.promptAudio === null, 'English audio path changed');
+      click('#btn-sun');
+      check(component.sunlightMode, 'Contrast toggle stopped working');
+      click('#btn-keypad');
+      check(component.keypadMode, 'Keypad toggle stopped working');
+      click('[data-idx="1"]');
+      await new Promise(resolve => setTimeout(resolve, 0));
+      check(component.state.step === 1, 'English selection failed');
+      const englishName = component.shadowRoot.querySelector('input');
+      englishName.value = 'Sam Test';
+      englishName.dispatchEvent(new Event('input', { bubbles: true }));
+      click('[type="submit"]');
+      const englishPhone = component.shadowRoot.querySelector('input');
+      englishPhone.value = '+251912345678';
+      englishPhone.dispatchEvent(new Event('input', { bubbles: true }));
+      click('[type="submit"]');
+      click('[data-idx="0"]');
+      click('[type="submit"]');
+      check(component.state.completed && !component.state.profile.referralCode, 'English registration regressed');
+      result.textContent = 'PASS: Amharic audio and registration; English, keypad, contrast, and registration';
+    } catch (error) {
+      result.textContent = 'FAIL: ' + error.message;
+    }
+  })();
+</script>
