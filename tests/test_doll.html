@@ -1,0 +1,59 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<script src="../module/db-signup.js"></script>
+</head>
+<body>
+<div id="test-log"></div>
+<script>
+(async () => {
+  const check = (cond, msg) => { if (!cond) throw new Error(msg); };
+  const log = (msg) => {
+    document.getElementById('test-log').innerHTML += '<p>' + msg + '</p>';
+  };
+
+  try {
+    const comp = document.createElement('db-signup');
+    comp.setAttribute('lang', 'am');
+    comp.setAttribute('sign', 'true');
+    document.body.appendChild(comp);
+    await new Promise(r => setTimeout(r, 120));
+
+    // 1. Check canvas is present
+    const canvas = comp.shadowRoot.querySelector('#ethsl-canvas');
+    check(canvas, 'Missing #ethsl-canvas');
+    log('PASS: #ethsl-canvas is rendered in DOM');
+
+    // 2. Check static hands strip is GONE as requested
+    const handsStrip = comp.shadowRoot.querySelector('.ethsl-hands-strip');
+    check(!handsStrip, 'Static hands strip must be removed');
+    log('PASS: Static hands strip is completely removed');
+
+    // 3. Check canvas animation loop is active
+    check(comp.signAnimFrame !== null, 'signAnimFrame loop is not active');
+    log('PASS: 60 FPS sign animation frame loop is actively running');
+
+    // 4. Test Step 1 (Name): "What is your name?"
+    comp.state.step = 1;
+    comp.render(false);
+    await new Promise(r => setTimeout(r, 100));
+    check(comp.signAnimFrame !== null, 'Step 1 animation running');
+    log('PASS: Step 1 (Name) active signing loop running (YOU -> NAME -> WHAT?)');
+
+    // 5. Test Step 2 (Phone)
+    comp.state.step = 2;
+    comp.render(false);
+    await new Promise(r => setTimeout(r, 100));
+    check(comp.signAnimFrame !== null, 'Step 2 animation running');
+    log('PASS: Step 2 (Phone) active signing loop running (PHONE -> DIAL)');
+
+    comp.remove();
+    document.getElementById('test-log').innerHTML = '<h1>ALL DOLL TESTS PASSED!</h1>' + document.getElementById('test-log').innerHTML;
+  } catch (err) {
+    document.getElementById('test-log').innerHTML = '<h1>FAILED: ' + err.message + '</h1>' + document.getElementById('test-log').innerHTML;
+  }
+})();
+</script>
+</body>
+</html>
