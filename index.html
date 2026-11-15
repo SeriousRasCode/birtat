@@ -7,20 +7,261 @@
     <link rel="stylesheet" href="assets/css/application_alx.css" media="all" />
     <link rel="stylesheet" href="assets/css/app.css" media="all" />
     <style>
-      body { padding: 2rem 1rem; }
-      .page-card { max-width: 46rem; }
+      :root {
+        --lux-black: #111111;
+        --lux-burgundy: #8b1e1e;
+        --lux-border: #e2e8f0;
+        --lux-bg: #f4f4f6;
+        --lux-text: #111111;
+        --lux-muted: #4b5563;
+      }
+
+      body {
+        background-color: var(--lux-bg);
+        color: var(--lux-text);
+        font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+      main.container-lg {
+        max-width: 800px;
+        padding-top: 3.5rem;
+        padding-bottom: 3.5rem;
+      }
+
+      .birtat-box {
+        background: #ffffff;
+        border: 1.5px solid var(--lux-border);
+        border-radius: 12px;
+        padding: 2rem;
+        margin: 1.5rem 0 2rem;
+      }
+      .birtat-box h2 {
+        margin: 0 0 0.5rem;
+        font-size: 1.45rem;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        color: var(--lux-text);
+      }
+      .birtat-box p {
+        margin: 0 0 1.25rem;
+        font-size: 1.05rem;
+        line-height: 1.6;
+        color: var(--lux-muted);
+      }
+
+      .birtat-controls {
+        display: flex;
+        align-items: center;
+        gap: 0.85rem;
+        flex-wrap: wrap;
+      }
+
+      .btn-alx-small {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        padding: 0.75rem 1.4rem;
+        background: var(--lux-black);
+        color: #ffffff !important;
+        font-size: 0.95rem;
+        font-weight: 700;
+        text-decoration: none !important;
+        border: 1.5px solid var(--lux-black);
+        border-radius: 6px;
+        cursor: pointer;
+      }
+      .btn-alx-small:hover {
+        background: #27272a;
+        border-color: #27272a;
+      }
+      :focus-visible {
+        outline: 3px solid var(--lux-black) !important;
+        outline-offset: 2px;
+      }
+
+      .dropdown-container {
+        position: relative;
+        display: inline-block;
+      }
+      .btn-dropdown-small {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.65rem 0.85rem;
+        background: #ffffff;
+        color: #3f5046;
+        font-size: 0.9rem;
+        font-weight: 600;
+        border: 1px solid #d5ddd6;
+        border-radius: 6px;
+        cursor: pointer;
+      }
+      .dropdown-container .caret {
+        font-size: 0.65rem;
+        display: inline-block;
+      }
+
+      .dropdown-popover-menu {
+        position: absolute;
+        top: calc(100% + 6px);
+        left: 0;
+        z-index: 1000;
+        min-width: min(320px, calc(100vw - 2rem));
+        background: #ffffff;
+        border: 1px solid var(--alx-border);
+        border-radius: 8px;
+        padding: 0.5rem;
+        display: none;
+      }
+      .dropdown-container.open .dropdown-popover-menu {
+        display: block;
+      }
+      .popover-header {
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        color: #657168;
+        padding: 0.55rem 0.65rem;
+        border-bottom: 1px solid #edf0ed;
+        margin-bottom: 0.35rem;
+      }
+      .popover-item {
+        display: block;
+        padding: 0.65rem;
+        border-radius: 5px;
+        text-decoration: none !important;
+      }
+      .popover-item-title {
+        display: flex;
+        align-items: center;
+        gap: 0.55rem;
+        color: #202a24;
+        font-weight: 600;
+        font-size: 0.9rem;
+      }
+      .popover-item-desc {
+        font-size: 0.8rem;
+        color: #657168;
+        margin: 0.3rem 0 0 1.55rem;
+        line-height: 1.45;
+      }
+
+      .card {
+        background: #ffffff;
+        border-radius: 10px;
+        border: 1px solid var(--alx-border);
+      }
+      .card-title a {
+        color: #202a24;
+        text-decoration: none;
+      }
+      .card-body {
+        padding: 1.25rem 1.4rem;
+      }
+      .card-text {
+        color: #657168;
+        line-height: 1.6;
+      }
+      .portal-note {
+        margin: -0.5rem 0 1.75rem;
+        color: #657168;
+        font-size: 0.85rem;
+      }
+      .portal-note summary {
+        color: #315a49;
+        cursor: pointer;
+        font-weight: 600;
+      }
+      .portal-note p {
+        max-width: 680px;
+        line-height: 1.55;
+      }
+      .page-list-heading {
+        color: #202a24;
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin-bottom: 0.8rem;
+      }
+      @media (max-width: 560px) {
+        main.container-lg {
+          padding-top: 2rem;
+          padding-bottom: 2rem;
+        }
+
+        .birtat-box {
+          padding: 1.2rem;
+        }
+      }
     </style>
   </head>
   <body class="bg-body-tertiary">
     <main class="container-lg">
-      <h1 class="mb-1">Savanna static pages</h1>
-      <p class="text-body-secondary mb-4">
-        Three learner pages frozen from the local dev app, for front-end and accessibility work.
-        No server, no application JavaScript, no network. The hamburger, the week strip, the score
-        details and programme modals, the module switcher and the courses dropdown still work;
-        every link is inert, and the language toggle and global search are removed.
-      </p>
+      <h1 class="mb-1" style="font-size: 1.9rem; font-weight: 700; color: #202a24;">Savanna learner portal</h1>
 
+      <section class="birtat-box" aria-label="Birtat Accessible Onboarding">
+        <h2>Get started with Savanna</h2>
+        <p>Set up your learner profile with guidance and accessibility options at every step.</p>
+
+        <div class="birtat-controls">
+          <a href="pages/signup.html" class="btn-alx-small">
+            <span>Start registration</span>
+            <span aria-hidden="true">→</span>
+          </a>
+
+          <div class="dropdown-container" id="features-dropdown">
+            <button type="button" class="btn-dropdown-small" id="btn-dropdown-features" aria-haspopup="true" aria-expanded="false">
+              <span>More / Demos</span>
+              <span class="caret">▼</span>
+            </button>
+            <div class="dropdown-popover-menu" role="menu" aria-labelledby="btn-dropdown-features">
+              <div class="popover-header">Additional Features</div>
+
+              <a href="demo/blank.html" class="popover-item" role="menuitem">
+                <div class="popover-item-title">
+                  <span>🎯</span>
+                  <span>Standalone &amp; Blindfold Judge Demo</span>
+                </div>
+                <div class="popover-item-desc">
+                  Judge demo with black-screen mode, keyboard numbers, and voice.
+                </div>
+              </a>
+
+              <a href="pages/jobs.html" class="popover-item" role="menuitem">
+                <div class="popover-item-title">
+                  <span>💼</span>
+                  <span>Accessible Career Gateway</span>
+                </div>
+                <div class="popover-item-desc">
+                  Zero-leak privacy job portal matched to learner access requirements.
+                </div>
+              </a>
+
+              <a href="pages/profile.html" class="popover-item" role="menuitem">
+                <div class="popover-item-title">
+                  <span>👤</span>
+                  <span>Learner Profile &amp; Support Settings</span>
+                </div>
+                <div class="popover-item-desc">
+                  View and update accessibility accommodations and preferences.
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <p class="text-body-secondary mb-3">Explore sample learner pages and course experiences.</p>
+      <details class="portal-note">
+        <summary>About these local demos</summary>
+        <p>
+          These pages are frozen examples from the local app for front-end and accessibility work.
+          No server or network is required. Some interactions work, but links are inert and the
+          language toggle and global search are not included.
+        </p>
+      </details>
+
+      <h2 class="page-list-heading">Learner page previews</h2>
       <div class="vstack gap-3 page-card">
         <div class="card">
           <div class="card-body">
@@ -62,5 +303,31 @@
         See <code>README.md</code> for what is real, what was substituted, and how to regenerate.
       </p>
     </main>
+
+    <script>
+      const dropdownWrap = document.getElementById('features-dropdown');
+      const dropdownBtn = document.getElementById('btn-dropdown-features');
+
+      dropdownBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = dropdownWrap.classList.toggle('open');
+        dropdownBtn.setAttribute('aria-expanded', isOpen);
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!dropdownWrap.contains(e.target)) {
+          dropdownWrap.classList.remove('open');
+          dropdownBtn.setAttribute('aria-expanded', 'false');
+        }
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          dropdownWrap.classList.remove('open');
+          dropdownBtn.setAttribute('aria-expanded', 'false');
+          dropdownBtn.focus();
+        }
+      });
+    </script>
   </body>
 </html>

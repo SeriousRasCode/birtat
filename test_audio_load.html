@@ -1,0 +1,38 @@
+<!doctype html>
+<html>
+<body>
+<pre id="log"></pre>
+<script>
+(async () => {
+  const log = [];
+  function print(msg) { log.push(msg); }
+
+  // Test loading Amharic lang.mp3
+  try {
+    const a = new Audio('http://localhost:8000/module/audio/am/lang.mp3');
+    await new Promise((resolve, reject) => {
+      a.oncanplaythrough = () => { print('Amharic can play through, duration: ' + a.duration); resolve(); };
+      a.onerror = (e) => { print('Amharic error: ' + (a.error ? a.error.code + ' ' + a.error.message : e)); resolve(); };
+      setTimeout(() => { print('Amharic timeout'); resolve(); }, 3000);
+    });
+  } catch (err) {
+    print('Amharic catch: ' + err);
+  }
+
+  // Test loading English lang.mp3
+  try {
+    const a = new Audio('http://localhost:8000/module/audio/en/lang.mp3');
+    await new Promise((resolve, reject) => {
+      a.oncanplaythrough = () => { print('English can play through, duration: ' + a.duration); resolve(); };
+      a.onerror = (e) => { print('English error: ' + (a.error ? a.error.code : e)); resolve(); };
+      setTimeout(() => { print('English timeout'); resolve(); }, 3000);
+    });
+  } catch (err) {
+    print('English catch: ' + err);
+  }
+
+  document.getElementById('log').textContent = log.join('\n');
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="am">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ALX Savanna — My Profile & Accommodations</title>
+  <link rel="stylesheet" href="../assets/css/application_alx.css">
+  <link rel="stylesheet" href="../assets/css/app.css">
+  <script src="../module/db-signup.js" defer></script>
+  <style>
+    :root {
+      --lux-black: #111111;
+      --lux-burgundy: #8b1e1e;
+      --lux-border: #e2e8f0;
+      --lux-bg: #f4f4f6;
+      --lux-text: #111111;
+      --lux-muted: #4b5563;
+    }
+    body {
+      background: var(--lux-bg);
+      min-height: 100vh;
+      margin: 0;
+      color: var(--lux-text);
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .alx-top-bar {
+      background: #ffffff;
+      border-bottom: 1.5px solid var(--lux-border);
+      padding: 1.1rem max(1.5rem, calc((100% - 1100px) / 2));
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .alx-brand-lockup {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      color: var(--lux-text);
+    }
+    .alx-badge {
+      background: var(--lux-black);
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 0.82rem;
+      padding: 0.35rem 0.65rem;
+      border-radius: 4px;
+      letter-spacing: 0.06em;
+    }
+    .alx-site-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--lux-text);
+    }
+    .alx-nav-link {
+      color: var(--lux-text);
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+    .alx-nav-link:hover {
+      text-decoration: underline;
+    }
+    main {
+      padding: 4rem 1.5rem 5rem;
+    }
+    @media (max-width: 600px) {
+      .alx-top-bar {
+        padding: 0.9rem 1rem;
+      }
+      main {
+        padding: 2.5rem 1rem 3.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="alx-top-bar">
+    <a href="../index.html" class="alx-brand-lockup">
+      <span class="alx-badge">ALX</span>
+      <span class="alx-site-title">Savanna Profile</span>
+    </a>
+    <a href="homepage-v1-paced.html" class="alx-nav-link">← Dashboard</a>
+  </header>
+
+  <main>
+    <!-- Mounts db-signup in edit mode as specified in Track 1 guide -->
+    <db-signup lang="am" mode="edit"></db-signup>
+  </main>
+
+  <script>
+    document.addEventListener('db-signup:done', () => {
+      setTimeout(() => { window.location.href = 'homepage-v1-paced.html'; }, 2000);
+    });
+  </script>
+</body>
+</html>

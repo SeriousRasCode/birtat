@@ -1,0 +1,132 @@
+{
+  "title": "Diiwaangelinta Fudud ee Birtat",
+  "keypadOn": "Kiiboodhka lambarka: Furan",
+  "keypadOff": "Kiiboodhka lambarka (1-2-3)",
+  "sunlight": "Iftiinka Qorraxda",
+  "listen": "Dhageyso",
+  "audioUnavailable": "Codka lama daari karo. Fadlan hubi codka qalabkaaga.",
+  "speak": "Cod ku jawaab",
+  "listening": "Waa la dhagaysanayaa... Hadda hadal",
+  "back": "Dib u noqo (*)",
+  "next": "Sii wad",
+  "finish": "Dhammeystir diiwaangelinta",
+  "repeatHint": "Ku celi taabo #, dib ugu noqo taabo *",
+  "offlineBanner": "Waxa lagu keydiyey taleefankaaga. Waxa la diri doonaa marka internet la helo.",
+  "stepProgress": "Su'aasha {step} ee {of}",
+  "steps": {
+    "lang": {
+      "heading": "Fadlan dooro luqaddaada",
+      "options": [
+        "አማርኛ",
+        "English",
+        "Afaan Oromoo",
+        "ትግርኛ",
+        "Af-Soomaali"
+      ]
+    },
+    "name": {
+      "heading": "Waa maxay magacaaga buuxa?",
+      "label": "Magaca Buuxa",
+      "error": "Fadlan geli magacaaga ama cod ku sheeg.",
+      "voiceSaved": "Codkaaga waxa loo keydiyey xaqiijin ahaan."
+    },
+    "phone": {
+      "heading": "Waa maxay lambarkaaga taleefanka?",
+      "label": "Lambarka taleefanka (09..., 07..., ama +251...)",
+      "error": "Fadlan geli lambar taleefan Itoobiya oo sax ah."
+    },
+    "idRoute": {
+      "heading": "Sidee baad u doonaysaa inaad u xaqiijiso aqoonsigaaga?",
+      "options": [
+        "Aqoonsiga Qaranka (Fayda)",
+        "Aqoonsiga Qaxootiga",
+        "Dukumenti Kale",
+        "Wax dukumenti ah ma haysto, fadlan hay'ad wada-shaqayn ii gudbiya"
+      ]
+    },
+    "support": {
+      "heading": "Adeegyada taageerada ee aad u baahan tahay? (Dooro dhammaan waxa khuseeya)",
+      "hint": "Taabo mar kale si aad u doorato/ka noqoto. Markaad dhammeyso riix 'Sii wad' ama 9.",
+      "options": [
+        "Qoraal qeexis (Captions)",
+        "Luqadda Dhegoolaha (EthSL)",
+        "Taageerada Akhristaha Shaashadda",
+        "Qoraal weyn",
+        "Turjubaan",
+        "Waqti dheeraad ah",
+        "Ma doonayo inaan sheego"
+      ]
+    },
+    "done": {
+      "heading": "Hambalyo! Diiwaangelintaadu way dhammaatay",
+      "body": "Waxaad diyaar u tahay adeegyada waxbarashada Savanna.",
+      "referralMsg": "Koodhkaaga tixraaca:",
+      "reset": "Diiwaangeli mar kale"
+    }
+  },
+  "done": {
+    "heading": "Hambalyo! Diiwaangelintaadu way dhammaatay",
+    "body": "Waxaad diyaar u tahay adeegyada waxbarashada Savanna.",
+    "referralMsg": "Koodhkaaga tixraaca:",
+    "reset": "Diiwaangeli mar kale"
+  },
+  "languageLabel": "Luqadda",
+  "contrastLabel": "Midabka iyo Kala Duwanaanshaha",
+  "contrastBtn": "Kala duwanaansho",
+  "ethslBtn": "Taageerada EthSL",
+  "keypadBtn": "Kiiboodhka",
+  "voiceGuidance": "Hagaha Codka Waa Daaran Yahay",
+  "supportToggleHint": "Taabo si aad u doorato/u tirtirto. Markaad dhammayso, taabo 'Sii wad' ama lambarka 9.",
+  "visionModes": {
+    "default": "Caadi (Solid)",
+    "protanopia": "Protanopia (Guduud)",
+    "deuteranopia": "Deuteranopia (Cagaar)",
+    "tritanopia": "Tritanopia (Buluug)",
+    "monochrome": "Hal-midab (Madow iyo Caddaan)",
+    "sunlight": "Iftiinka Qorraxda (Kala duwanaansho Sare)"
+  },
+  "ethsl": {
+    "tabImage": "Sawirka Turjubaanka",
+    "tabCamera": "Isticmaal Kaamerada",
+    "speedNormal": "Xawaare caadi ah",
+    "speedSlow": "Hadalka gaabso",
+    "replay": "Ku celi codka",
+    "watermark": "Turjubaanka Luqadda Dhegoolaha EthSL",
+    "camPreview": "MUUQAALKA KAAMERADA",
+    "ready": "Diyaar",
+    "handPrompt": "🖐️ Gacantaada ku dhex tus qaab-dhismeedka",
+    "stepBadge": "Tallaabada",
+    "signs": {
+      "lang": {
+        "cue": "Luqadda",
+        "title": "Astaanta Xulashada Luqadda",
+        "desc": "Labada gacmood waxay u kala wareegayaan bidix iyo midig, iyagoo tilmaamaya xulashooyinka luqadda."
+      },
+      "name": {
+        "cue": "Magaca",
+        "title": "Astaanta Weydiinta Magaca",
+        "desc": "Labo farrood ayaa laabta taabanaya ka dibna hore u fidiya, iyagoo weydiinaya magacaaga oo buuxa."
+      },
+      "phone": {
+        "cue": "Telefoonka",
+        "title": "Astaanta Telefoonka iyo Lambarada",
+        "desc": "Suulka oo dhegta saaran, farta yar oo afka saaran, gacanta kalena waxay muujinaysaa garaacista lambarada."
+      },
+      "idRoute": {
+        "cue": "Aqoonsiga",
+        "title": "Astaanta Dukumiintiga Aqoonsiga",
+        "desc": "Baabacada fidsan waxay noqonaysaa dukumiintiga halka gacanta midig ay muujinayso kaarka aqoonsiga."
+      },
+      "support": {
+        "cue": "Taageero",
+        "title": "Astaanta Taageerada Waxbarashada",
+        "desc": "Gacanta midig waxay dul saaran tahay baabacada bidix iyagoo isla kor u qaadaya astaanta caawinta."
+      },
+      "done": {
+        "cue": "Dhammaystiran",
+        "title": "Astaanta Dhammaystirka iyo Dabaaldagga",
+        "desc": "Labada gacmood oo hore loo fidiyey ayaa si farxad leh u ruxmaya, iyagoo xaqiijinaya dhammaystirka."
+      }
+    }
+  }
+}

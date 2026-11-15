@@ -1,0 +1,132 @@
+{
+  "title": "Galmee Qaqqabamaa Birtat",
+  "keypadOn": "Kiiboodii lakkoofsaa: Banaadha",
+  "keypadOff": "Kiiboodii lakkoofsaa (1-2-3)",
+  "sunlight": "Ifa Aduu / Fakkaattii",
+  "listen": "Dhaggeeffadhaa",
+  "audioUnavailable": "Sagalee dhageessisuun hin danda'amne. Sagalee meeshaa keessanii mirkaneessaa.",
+  "speak": "Sagaleedhaan deebisaa",
+  "listening": "Dhaggeeffachaa jira... Amma dubbadhaa",
+  "back": "Duubatti (*)",
+  "next": "Itti fufi",
+  "finish": "Galmee xumuri",
+  "repeatHint": "Irra deebi'uuf # dhiibaa, duubatti deebi'uuf * dhiibaa",
+  "offlineBanner": "Bilbila keessan irratti olkaawameera. Yeroo intarneetiin argamu ni ergama.",
+  "stepProgress": "Gaaffii {step} keessaa {of}",
+  "steps": {
+    "lang": {
+      "heading": "Afaan keessan filadhaa",
+      "options": [
+        "አማርኛ",
+        "English",
+        "Afaan Oromoo",
+        "ትግርኛ",
+        "Af-Soomaali"
+      ]
+    },
+    "name": {
+      "heading": "Maqaan keessan guutuun eenyu?",
+      "label": "Maqaa Guutuu",
+      "error": "Maaloo maqaa keessan galchaa ykn sagaleedhaan dubbadhaa.",
+      "voiceSaved": "Waraabbiin sagalee keessanii ragaa dabalataatti olkaawameera."
+    },
+    "phone": {
+      "heading": "Lakkoofsi bilbila keessanii meeqa?",
+      "label": "Lakkoofsa bilbilaa (09..., 07..., ykn +251...)",
+      "error": "Maaloo lakkoofsa bilbilaa Itoophiyaa sirrii galchaa."
+    },
+    "idRoute": {
+      "heading": "Eenyummaa keessan akkamitti mirkaneeffachuu barbaaddu?",
+      "options": [
+        "Waraqaa Eenyummaa Biyyooleessaa (Faayidaa)",
+        "Waraqaa Eenyummaa Baqattootaa",
+        "Sanada Biroo",
+        "Sanada homaa hin qabu, karaa jaarmayaa deeggaraatiin na dabarsaa"
+      ]
+    },
+    "support": {
+      "heading": "Tajaajila deeggarsaa kamtu isin barbaachisa? (Hunda filachuu dandeessu)",
+      "hint": "Irra deebi'ii dhiibi filachuuf/dhiisuuf. Yeroo xumurtan 'Itti fufi' ykn 9 dhiibaa.",
+      "options": [
+        "Ibsa barreeffamaa (Captions)",
+        "Afaan Mallattoo (EthSL)",
+        "Deeggarsa dubbisaa iskiriinii",
+        "Barreeffama gurguddaa",
+        "Turjumaana",
+        "Yeroo dabalataa",
+        "Dubbachuu hin barbaadu"
+      ]
+    },
+    "done": {
+      "heading": "Baga gammaddan! Galmeen keessan milkaa'eera",
+      "body": "Gara tajaajila barumsaa Savanna tiif qophiidha.",
+      "referralMsg": "Koodiin daddabarsaa keessan:",
+      "reset": "Haaraa galmeessi"
+    }
+  },
+  "done": {
+    "heading": "Baga gammaddan! Galmeen keessan milkaa'eera",
+    "body": "Gara tajaajila barumsaa Savanna tiif qophiidha.",
+    "referralMsg": "Koodiin daddabarsaa keessan:",
+    "reset": "Haaraa galmeessi"
+  },
+  "languageLabel": "Afaan",
+  "contrastLabel": "Halluu fi Faallaa",
+  "contrastBtn": "Faallaa",
+  "ethslBtn": "Deeggarsa EthSL",
+  "keypadBtn": "Kiiboodhii",
+  "voiceGuidance": "Qajeelfama Sagalee Banameera",
+  "supportToggleHint": "Filannoo filachuuf/haquuf tuqaa. Yeroo xumurtan 'Sii wad' ykn lakkoofsa 9 tuqaa.",
+  "visionModes": {
+    "default": "Durtii (Solid)",
+    "protanopia": "Pirootaanooppiyaa (Diimaa)",
+    "deuteranopia": "Diyuuteraanooppiyaa (Magariisa)",
+    "tritanopia": "Tiriitaanooppiyaa (Cuquliisa)",
+    "monochrome": "Monochrome (Gurraacha/Adii)",
+    "sunlight": "Ifa Aduu (Faallaa Guddaa)"
+  },
+  "ethsl": {
+    "tabImage": "Fakkii Hiikaa",
+    "tabCamera": "Kaameraa fayyadamaa",
+    "speedNormal": "Saffisa sirrii",
+    "speedSlow": "Suuta dubbadhu",
+    "replay": "Sagalee irra deebi'i",
+    "watermark": "Hiikaa Afaan Mallattoo EthSL",
+    "camPreview": "MUL'ATA KAAMERAA",
+    "ready": "Qophii",
+    "handPrompt": "🖐️ Harka keessan as keessatti agarsiisaa",
+    "stepBadge": "Sadarkaa",
+    "signs": {
+      "lang": {
+        "cue": "Afaan",
+        "title": "Mallattoo Filannoo Afaanii",
+        "desc": "Harki lamaan gara bitaa fi mirgaatti wal jijjiiruun filannoo afaanii agarsiisu."
+      },
+      "name": {
+        "cue": "Maqaa",
+        "title": "Mallattoo Gaaffii Maqaa",
+        "desc": "Qubni lama gara lapheetti qubatee gara fuulduraatti diriira, maqaa keessan guutuu gaafata."
+      },
+      "phone": {
+        "cue": "Bilbila",
+        "title": "Mallattoo Bilbilaa fi Kiiboodhii",
+        "desc": "Qubni guddaan gurra irra, qubni xinnaan afaan irra ta'ee mallattoon bilbilaa fi lakkoofsaa ni mul'ata."
+      },
+      "idRoute": {
+        "cue": "Waraqaa Eenyummaa",
+        "title": "Mallattoo Waraqaa Eenyummaa",
+        "desc": "Harki bitaa waraqaa ta'ee, harki mirgaa boca kaardii eenyummaa agarsiisa."
+      },
+      "support": {
+        "cue": "Deeggarsa",
+        "title": "Mallattoo Deeggarsa Barnootaa",
+        "desc": "Harki mirgaa ganbisaa harka bitaa irra ta'ee ol ka'uun mallattoo deeggarsaa kenna."
+      },
+      "done": {
+        "cue": "Xumurameera",
+        "title": "Mallattoo Xumuraa fi Gammachuu",
+        "desc": "Harki lamaan gara fuulduraatti diriiree gammachuun raafama, xumuramuusaa mirkaneessa."
+      }
+    }
+  }
+}

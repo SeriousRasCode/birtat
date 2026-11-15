@@ -1,0 +1,230 @@
+openapi: 3.0.3
+info:
+  title: Savanna Digital Bridge - Birtat Onboarding API
+  description: >
+    Privacy-isolated REST API for Track 1: Accessible Onboarding.
+    Learner profiles and sensitive accommodation/support choices are strictly separated.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080/api/v1
+    description: Local development / Docker environment
+
+paths:
+  /learners:
+    post:
+      summary: Create learner profile
+      description: Registers basic profile data without sensitive accommodation choices.
+      operationId: createLearner
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LearnerInput'
+            example:
+              name: "Amara Nwosu"
+              phone: "+251911223344"
+              language: "am"
+              idRoute: "ብሔራዊ መታወቂያ (ፋይዳ)"
+      responses:
+        '201':
+          description: Learner created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LearnerCreated'
+              example:
+                id: "lrn_7829a3f1"
+                status: "created"
+        '400':
+          description: Invalid input or malformed phone number
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "Invalid phone number. Must match Ethiopian format (+251...)."
+
+  /learners/{id}:
+    patch:
+      summary: Update learner profile
+      operationId: updateLearner
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "lrn_7829a3f1"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LearnerInput'
+      responses:
+        '200':
+          description: Learner profile updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  status:
+                    type: string
+        '404':
+          description: Learner not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      summary: Delete learner data
+      description: Complete right-to-be-forgotten deletion. Removes profile and support records.
+      operationId: deleteLearner
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "lrn_7829a3f1"
+      responses:
+        '200':
+          description: Data deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  deleted:
+                    type: boolean
+                    example: true
+        '404':
+          description: Learner not found
+
+  /learners/{id}/support:
+    put:
+      summary: Save accommodation preferences (isolated)
+      description: >
+        Stores learner support and accessibility choices in a segregated table/partition.
+        Never shared with employers or merged into standard profile records.
+      operationId: saveSupportPreferences
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "lrn_7829a3f1"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SupportInput'
+            example:
+              support:
+                - "captions"
+                - "interpreter:am"
+                - "screen-reader"
+      responses:
+        '200':
+          description: Support preferences stored separately
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "saved"
+        '404':
+          description: Learner not found
+
+  /learners/{id}/export:
+    get:
+      summary: Export all learner data
+      description: GDPR / privacy export of all stored records held about this learner.
+      operationId: exportLearnerData
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "lrn_7829a3f1"
+      responses:
+        '200':
+          description: Complete data export
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  profile:
+                    $ref: '#/components/schemas/LearnerInput'
+                  support:
+                    type: array
+                    items:
+                      type: string
+                  exportedAt:
+                    type: string
+                    format: date-time
+
+components:
+  schemas:
+    LearnerInput:
+      type: object
+      required:
+        - name
+        - phone
+        - language
+      properties:
+        name:
+          type: string
+          example: "Abebe Kebede"
+        phone:
+          type: string
+          example: "+251911223344"
+        language:
+          type: string
+          enum: [am, en]
+          example: "am"
+        idRoute:
+          type: string
+          example: "ብሔራዊ መታወቂያ (ፋይዳ)"
+        referralCode:
+          type: string
+          example: "DB-8492"
+
+    LearnerCreated:
+      type: object
+      properties:
+        id:
+          type: string
+        status:
+          type: string
+
+    SupportInput:
+      type: object
+      required:
+        - support
+      properties:
+        support:
+          type: array
+          items:
+            type: string
+          example: ["captions", "interpreter:am"]
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Error description in words."
