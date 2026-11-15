@@ -3,24 +3,352 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ALX Savanna — Accessible Sign-Up</title>
+  <title>ሳቫና — ተደራሽ ምዝገባ</title>
   <link rel="stylesheet" href="../assets/css/application_alx.css">
   <link rel="stylesheet" href="../assets/css/app.css">
   <script src="../module/db-signup.js" defer></script>
+  <style>
+    :root {
+      --lux-black: #111111;
+      --lux-burgundy: #8b1e1e;
+      --lux-border: #e2e8f0;
+      --lux-bg: #f4f4f6;
+      --lux-text: #111111;
+      --lux-muted: #4b5563;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: var(--lux-bg);
+      min-height: 100vh;
+      margin: 0;
+      color: var(--lux-text);
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .alx-top-bar {
+      background: #ffffff;
+      border-bottom: 1.5px solid var(--lux-border);
+      padding: 1.1rem max(1.5rem, calc((100% - 1100px) / 2));
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .alx-brand-lockup {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      color: var(--lux-text);
+    }
+
+    .alx-badge {
+      background: var(--lux-black);
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 0.82rem;
+      padding: 0.35rem 0.65rem;
+      border-radius: 4px;
+      letter-spacing: 0.06em;
+    }
+
+    .alx-site-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--lux-text);
+    }
+
+    .alx-nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+    }
+
+    .alx-nav-link {
+      color: var(--lux-text);
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    .alx-nav-link:hover {
+      text-decoration: underline;
+    }
+
+    .alx-dash-pill {
+      color: #ffffff !important;
+      background: var(--lux-black);
+      text-decoration: none !important;
+      font-weight: 700;
+      font-size: 0.92rem;
+      padding: 0.65rem 1.25rem;
+      border-radius: 6px;
+      border: 1.5px solid var(--lux-black);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+    }
+
+    .alx-dash-pill:hover {
+      background: #27272a;
+      border-color: #27272a;
+    }
+
+    main {
+      padding: 4rem 1.5rem 5rem;
+    }
+
+    .signup-hero {
+      max-width: 680px;
+      margin: 0 auto 2.5rem;
+    }
+
+    .signup-kicker {
+      display: block;
+      color: var(--lux-burgundy);
+      font-size: 0.88rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 0.85rem;
+    }
+
+    .signup-title {
+      font-size: clamp(2.2rem, 5vw, 3rem);
+      font-weight: 800;
+      color: var(--lux-text);
+      margin: 0 0 0.85rem;
+      letter-spacing: -0.04em;
+      line-height: 1.15;
+    }
+
+    .signup-subtitle {
+      max-width: 640px;
+      color: var(--lux-muted);
+      font-size: 1.12rem;
+      margin: 0 0 1.5rem;
+      line-height: 1.7;
+    }
+
+    .feature-chips {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin-top: 1.25rem;
+    }
+
+    .chip {
+      background: #ffffff;
+      border: 1.5px solid var(--lux-border);
+      border-radius: 9999px;
+      color: var(--lux-text);
+      font-size: 0.92rem;
+      font-weight: 700;
+      padding: 0.55rem 1.25rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+    }
+
+    .chip::before {
+      content: "•";
+      color: var(--lux-burgundy);
+      font-weight: 900;
+      font-size: 1.1rem;
+    }
+
+    .signup-container {
+      max-width: 680px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 600px) {
+      .alx-top-bar {
+        padding: 0.9rem 1rem;
+      }
+
+      .alx-nav-actions {
+        gap: 0.75rem;
+      }
+
+      .alx-nav-link {
+        font-size: 0.88rem;
+      }
+
+      .alx-dash-pill {
+        padding: 0.55rem 0.85rem;
+        font-size: 0.85rem;
+      }
+
+      main {
+        padding: 2.5rem 1rem 3.5rem;
+      }
+
+      .signup-hero {
+        margin-bottom: 1.75rem;
+      }
+    }
+  </style>
 </head>
-<body style="background: #f8f9fa; min-height: 100vh;">
-  <header style="background: #ffffff; border-bottom: 1px solid #e0e0e0; padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center;">
-    <strong style="font-size: 1.25rem; color: #002b56;">ALX Savanna</strong>
-    <a href="homepage-v1-paced.html" style="color: #002b56; font-weight: 600;">Dashboard →</a>
+<body>
+  <header class="alx-top-bar">
+    <a href="../index.html" class="alx-brand-lockup">
+      <span class="alx-badge">ALX</span>
+      <span class="alx-site-title">Savanna</span>
+    </a>
+    <div class="alx-nav-actions">
+      <a href="../index.html" class="alx-nav-link">← ዋና ገጽ (Hub)</a>
+      <a href="homepage-v1-paced.html" class="alx-dash-pill">ዳሽቦርድ →</a>
+    </div>
   </header>
 
-  <main style="padding: 2rem 1rem;">
-    <db-signup lang="am"></db-signup>
+  <main>
+    <div class="signup-hero">
+      <span class="signup-kicker">ሳቫና · የተማሪዎች ምዝገባ</span>
+      <h1 class="signup-title">የተማሪ መገለጫዎን ይፍጠሩ</h1>
+      <p class="signup-subtitle">
+        በአምስት የኢትዮጵያ ቋንቋዎች የተዘጋጀ ምቹ ምዝገባ። በድምፅ፣ በቁጥር መደወያ እና በምልክት ቋንቋ (EthSL) ድጋፍ የሚፈልጉትን አማራጭ ይምረጡ።
+      </p>
+      <div class="feature-chips">
+        <span class="chip">5 ቋንቋዎች</span>
+        <span class="chip">ድምፅ እና ቁጥር መደወያ</span>
+        <span class="chip">የምልክት ቋንቋ (EthSL) ድጋፍ</span>
+      </div>
+    </div>
+
+    <!-- Mounts db-signup web component -->
+    <div class="signup-container">
+      <db-signup lang="am"></db-signup>
+    </div>
   </main>
 
   <script>
+    const PAGE_I18N = {
+      am: {
+        docTitle: "ሳቫና — ተደራሽ ምዝገባ",
+        brand: "ሳቫና",
+        hub: "← ዋና ገጽ (Hub)",
+        dash: "ዳሽቦርድ →",
+        kicker: "ሳቫና · የተማሪዎች ምዝገባ",
+        title: "የተማሪ መገለጫዎን ይፍጠሩ",
+        subtitle: "በአምስት የኢትዮጵያ ቋንቋዎች የተዘጋጀ ምቹ ምዝገባ። በድምፅ፣ በቁጥር መደወያ እና በምልክት ቋንቋ (EthSL) ድጋፍ የሚፈልጉትን አማራጭ ይምረጡ።",
+        chips: ["5 ቋንቋዎች", "ድምፅ እና ቁጥር መደወያ", "የምልክት ቋንቋ (EthSL) ድጋፍ"]
+      },
+      en: {
+        docTitle: "ALX Savanna — Accessible Onboarding",
+        brand: "Savanna",
+        hub: "← Portal Hub",
+        dash: "Dashboard →",
+        kicker: "SAVANNA · LEARNER REGISTRATION",
+        title: "Create your learner profile",
+        subtitle: "A guided sign-up in five Ethiopian languages. Choose the options that work for you, with voice, keypad, and EthSL support available along the way.",
+        chips: ["5 languages", "Voice and keypad", "EthSL support"]
+      },
+      om: {
+        docTitle: "ALX Savanna — Galmee Qaqqabamaa",
+        brand: "Savanna",
+        hub: "← Fuula Jalqabaa",
+        dash: "Daashboordii →",
+        kicker: "SAVANNA · GALMEE BARATTOOTAA",
+        title: "Piroofayilii barataa keessanii uumaa",
+        subtitle: "Galmee qaqqabamaa afaanota Itoophiyaa shaniin qophaa'e. Filannoowwan isiniif ta'an sagaleen, kiiboodiin ykn afaan mallattootiin filadhaa.",
+        chips: ["Afaanota 5", "Sagalee fi kiiboodii", "Deeggarsa EthSL"]
+      },
+      ti: {
+        docTitle: "ሳቫና — ተበጻሒ ምዝገባ",
+        brand: "ሳቫና",
+        hub: "← ቀንዲ ገጽ",
+        dash: "ዳሽቦርድ →",
+        kicker: "ሳቫና · ምዝገባ ተመሃሮ",
+        title: "ናይ ተምሃራይ ፕሮፋይልኩም ፍጠሩ",
+        subtitle: "ብሓሙሽተ ቋንቋታት ኢትዮጵያ ዝተዳለወ ምቹእ ምዝገባ። ብድምጺ፣ ብቁጽሪ መደወሊን ብናይ ምልክት ቋንቋን (EthSL) ደገፍ ድላዮም ይምረጹ።",
+        chips: ["5 ቋንቋታት", "ድምጽን ቁጽሪ መደወሊን", "ናይ ምልክት ቋንቋ ደገፍ"]
+      },
+      so: {
+        docTitle: "ALX Savanna — Diiwaangelin Fudud",
+        brand: "Savanna",
+        hub: "← Bogga Hore",
+        dash: "Dashboard →",
+        kicker: "SAVANNA · DIIWAANGELINTA ARDAYDA",
+        title: "Sameyso astaantaada ardaynimo",
+        subtitle: "Diiwaangelin sahlan oo ku baxeysa shan luqadood oo Itoobiya ah. Dooro waxa kugu habboon cod ahaan, lambar ahaan, ama luqadda dhegoolaha.",
+        chips: ["5 Luqadood", "Cod iyo Lambarro", "Taageerada EthSL"]
+      }
+    };
+
+    function setPageLanguage(lang) {
+      const data = PAGE_I18N[lang] || PAGE_I18N.am;
+      document.documentElement.lang = lang;
+      document.title = data.docTitle;
+
+      const brandEl = document.querySelector('.alx-site-title');
+      if (brandEl) brandEl.textContent = data.brand;
+
+      const hubEl = document.querySelector('.alx-nav-link');
+      if (hubEl) hubEl.textContent = data.hub;
+
+      const dashEl = document.querySelector('.alx-dash-pill');
+      if (dashEl) dashEl.textContent = data.dash;
+
+      const kickerEl = document.querySelector('.signup-kicker');
+      if (kickerEl) kickerEl.textContent = data.kicker;
+
+      const titleEl = document.querySelector('.signup-title');
+      if (titleEl) titleEl.textContent = data.title;
+
+      const subtitleEl = document.querySelector('.signup-subtitle');
+      if (subtitleEl) subtitleEl.textContent = data.subtitle;
+
+      const chipEls = document.querySelectorAll('.feature-chips .chip');
+      if (chipEls && chipEls.length >= 3) {
+        chipEls[0].textContent = data.chips[0];
+        chipEls[1].textContent = data.chips[1];
+        chipEls[2].textContent = data.chips[2];
+      }
+    }
+
+    function initPageLanguage() {
+      let lang = 'am';
+      try {
+        const raw = localStorage.getItem('db_signup_state_v1');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed && parsed.profile && parsed.profile.language) {
+            lang = parsed.profile.language;
+          }
+        } else {
+          const comp = document.querySelector('db-signup');
+          if (comp && comp.getAttribute('lang')) {
+            lang = comp.getAttribute('lang');
+          }
+        }
+      } catch (_) {}
+      setPageLanguage(lang);
+    }
+
+    window.addEventListener('db-signup:language', (e) => {
+      if (e.detail && e.detail.language) {
+        setPageLanguage(e.detail.language);
+      }
+    });
+
+    document.addEventListener('db-signup:language', (e) => {
+      if (e.detail && e.detail.language) {
+        setPageLanguage(e.detail.language);
+      }
+    });
+
+    initPageLanguage();
+    document.addEventListener('DOMContentLoaded', initPageLanguage);
+
     document.addEventListener('db-signup:done', () => {
-      setTimeout(() => { window.location.href = 'homepage-v1-paced.html'; }, 2500);
+      setTimeout(() => { window.location.href = 'homepage-v1-paced.html'; }, 2200);
     });
   </script>
 </body>

@@ -80,19 +80,53 @@ Open:
 ## Install, Level 1
 ```html
 <script src="../module/db-signup.js" defer></script>
+<!-- New registration -->
 <db-signup lang="am" api="https://your-server.example"></db-signup>
+<!-- Edit / profile review in pages/profile.html -->
+<db-signup lang="am" mode="edit"></db-signup>
 ```
-* **Attributes:** `lang` (`"am"` or `"en"`), `api` (optional backend URL for offline sync).
+* **Attributes:**
+  * `lang` (`"am"` or `"en"`)
+  * `mode` (optional, `"edit"` loads saved learner profile and accommodations)
+  * `sign` (optional, `"true"` activates the animated EthSL sign language avatar guide)
+  * `keypad` (optional, `"true"` activates telephone keypad mode)
+  * `api` (optional backend URL for offline sync)
 * **Events:**
   * `db-signup:step` — `{ step, of }`
   * `db-signup:done` — `{ profile: { language, name, phone, idRoute, referralCode }, voiceNotes }`
   * `db-signup:support` — `{ support: [...] }` (dispatched separately so support needs never mix with profile/employer payloads).
+* **Starter Mounts:**
+  * Registration: `pages/signup.html`
+  * Profile Edit: `pages/profile.html` (linked from the sidebar's "My Profile" item on all course pages).
+
+## Install, Level 2
+The Level 2 REST contract is defined in [`openapi.yaml`](./openapi.yaml) at the repository root.
+
+Sample curl commands for automated ingestion and testing:
+```bash
+# 1. Create a learner (201 Created)
+curl -X POST http://localhost:8080/api/v1/learners \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Amara Nwosu","phone":"+251911223344","language":"am","idRoute":"ብሔራዊ መታወቂያ (ፋይዳ)"}'
+
+# 2. Save sensitive support choices separately (Zero-Leak)
+curl -X PUT http://localhost:8080/api/v1/learners/lrn_7829a3f1/support \
+  -H "Content-Type: application/json" \
+  -d '{"support":["captions","interpreter:am"]}'
+
+# 3. Export all learner data (GDPR / Right to Portability)
+curl -X GET http://localhost:8080/api/v1/learners/lrn_7829a3f1/export
+
+# 4. Delete learner data (Right to be Forgotten)
+curl -X DELETE http://localhost:8080/api/v1/learners/lrn_7829a3f1
+```
 
 ## Install, Level 3
 `pages/jobs.html` embeds standard `schema.org/JobPosting` JSON-LD so external job boards and search engines can index accessible roles.
 
 ## Languages and how to add one
 Translations live in `module/i18n/en.json` and `module/i18n/am.json`. After editing either file, run `node scripts/build-i18n.js` to embed the translations in the web component. If you change Amharic prompts, run `node scripts/build-audio.js` while online to regenerate the bundled MP3 clips. Amharic Listen prompts then play offline, even when the device has no Amharic speech voice. The current language choice is retained when a learner reloads the page.
+* **Ethiopian Calendar:** The browser-native Ethiopic calendar (`am-ET-u-ca-ethiopic`) automatically stamps completion certificates with the localized date (e.g. `6 ኅዳር 2019`).
 
 ## Offline and slow connection
 * Every answer saves immediately to `localStorage`; reloading resumes on the exact step.
@@ -106,8 +140,8 @@ Translations live in `module/i18n/en.json` and `module/i18n/am.json`. After edit
 $0/month (100% static client-side Web Component with zero paid API dependencies; runs on any basic static host or CDN for 3,000+ learners).
 
 ## Finished and not finished
-* **Finished:** 5-step accessible engine, Amharic/English i18n, Phone Keypad Mode (`1`–`9`, `*`, `#`), `navigator.vibrate` haptic feedback, Sunlight High-Contrast Mode, Voice Input + Audio Fallback, Offline No-ID Referral Code, Blindfold Judge Demo, and `schema.org` Career Gateway.
-* **Not finished:** Full server-side REST persistence (`openapi.yaml`)—currently runs client-side with offline queue sync hooks ready for any `/api/v1/learners` endpoint.
+* **Finished:** 5-step accessible engine, Amharic/English i18n, EthSL (Ethiopian Sign Language) animated hand kinematics guide, Phone Keypad Mode (`0`–`9`, `*`, `#`), `navigator.vibrate` haptic feedback, Sunlight High-Contrast Mode, Voice Input + Audio Fallback, Offline No-ID Referral Code, Ethiopian Calendar timestamps, Blindfold Judge Demo, `profile.html` edit mode, Level 2 `openapi.yaml` specification, and `schema.org` Career Gateway.
+* **Not finished:** Remote database cluster setup (intentionally decoupled to keep host integration zero-cost and client-first).
 
 ## Libraries and their licences
 None — 100% vanilla HTML, CSS, and JavaScript (MIT License).

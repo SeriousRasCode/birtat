@@ -7,7 +7,7 @@ const start = '// BEGIN GENERATED TRANSLATIONS (run `node scripts/build-i18n.js`
 const end = '// END GENERATED TRANSLATIONS';
 const translations = {};
 
-for (const lang of ['am', 'en']) {
+for (const lang of ['am', 'en', 'om', 'ti', 'so']) {
   translations[lang] = JSON.parse(fs.readFileSync(path.join(root, 'module', 'i18n', `${lang}.json`), 'utf8'));
 }
 
@@ -18,3 +18,4 @@ if (before < 0 || after < 0) throw new Error('Translation markers are missing');
 
 const generated = `${start}\nconst TRANSLATIONS = ${JSON.stringify(translations, null, 2)};\n`;
 fs.writeFileSync(source, code.slice(0, before) + generated + code.slice(after));
+console.log('Successfully embedded 5 languages into db-signup.js');

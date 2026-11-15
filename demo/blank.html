@@ -24,7 +24,7 @@
     body.blindfold #curtain { display: flex; }
     #exit-curtain {
       display: none; position: fixed; top: 1rem; right: 1rem; z-index: 10000;
-      min-height: 48px; padding: .6rem 1rem; background: #222; color: #fff; border: 2px solid #fff;
+      min-height: 48px; padding: .6rem 1rem; background: #222; color: #fff; border: 2px solid #fff; cursor: pointer;
     }
     body.blindfold #exit-curtain { display: block; }
     pre { max-width: 540px; margin: 1rem auto; background: #fff; padding: 1rem; border-radius: 8px; overflow-x: auto; }
@@ -38,9 +38,9 @@
 
   <div id="curtain" aria-hidden="true">
     <h1>Black Screen (Blindfold) Mode Active</h1>
-    <p>Use keyboard numbers (1-9, *, #) or voice prompts to register without seeing the screen.</p>
+    <p>Use keyboard numbers (1-9, 0, *, #) or voice prompts to register without seeing the screen.</p>
   </div>
-  <button type="button" id="exit-curtain">Exit Black Screen</button>
+  <button type="button" id="exit-curtain">Exit Black Screen (Esc)</button>
 
   <main>
     <db-signup lang="am"></db-signup>
@@ -50,8 +50,32 @@
 
   <script>
     const log = document.getElementById('event-log');
-    document.getElementById('toggle-curtain').onclick = () => document.body.classList.add('blindfold');
-    document.getElementById('exit-curtain').onclick = () => document.body.classList.remove('blindfold');
+    const toggleBtn = document.getElementById('toggle-curtain');
+    const exitBtn = document.getElementById('exit-curtain');
+
+    toggleBtn.onclick = () => {
+      document.body.classList.add('blindfold');
+      const signup = document.querySelector('db-signup');
+      if (signup) {
+        if (typeof signup.enableKeypad === 'function') {
+          signup.enableKeypad();
+        } else {
+          signup.keypadMode = true;
+          signup.render(false);
+          signup.readCurrentStep();
+        }
+      }
+    };
+
+    exitBtn.onclick = () => {
+      document.body.classList.remove('blindfold');
+    };
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && document.body.classList.contains('blindfold')) {
+        document.body.classList.remove('blindfold');
+      }
+    });
 
     document.addEventListener('db-signup:done', (e) => {
       log.textContent = '1. PROFILE EVENT (Public):\n' + JSON.stringify(e.detail, null, 2) + '\n\n' + log.textContent;

@@ -16,7 +16,13 @@
   "steps": {
     "lang": {
       "heading": "Choose your language",
-      "options": ["Amharic (አማርኛ)", "English"]
+      "options": [
+        "አማርኛ",
+        "English",
+        "Afaan Oromoo",
+        "ትግርኛ",
+        "Af-Soomaali"
+      ]
     },
     "name": {
       "heading": "What is your full name?",
@@ -39,8 +45,8 @@
       ]
     },
     "support": {
-      "heading": "What support helps you learn best? (Optional)",
-      "note": "Saved privately on your device. Never shared with employers.",
+      "heading": "Which support accommodations do you need? (Select all that apply)",
+      "hint": "Tap again to toggle. Press 'Continue' or 9 when done.",
       "options": [
         "Captions",
         "Sign language (EthSL)",
@@ -50,11 +56,77 @@
         "More time",
         "Prefer not to say"
       ]
+    },
+    "done": {
+      "heading": "Congratulations! Registration complete",
+      "body": "You are ready to access Savanna learning services.",
+      "referralMsg": "Your registration referral code:",
+      "reset": "Register another learner"
     }
   },
   "done": {
-    "heading": "Registration Complete!",
-    "referralMsg": "Provisional Partner Referral Code:",
-    "reset": "Start Over / Edit"
+    "heading": "Congratulations! Registration complete",
+    "body": "You are ready to access Savanna learning services.",
+    "referralMsg": "Your registration referral code:",
+    "reset": "Register another learner"
+  },
+  "languageLabel": "Language",
+  "contrastLabel": "Color & Contrast",
+  "contrastBtn": "Contrast",
+  "ethslBtn": "EthSL Support",
+  "keypadBtn": "Keypad",
+  "voiceGuidance": "Voice Guidance On",
+  "supportToggleHint": "Tap to toggle choices. When done, press 'Continue' or press 9 on keypad.",
+  "visionModes": {
+    "default": "Default Solid",
+    "protanopia": "Protanopia (Red-Blind)",
+    "deuteranopia": "Deuteranopia (Green-Blind)",
+    "tritanopia": "Tritanopia (Blue-Blind)",
+    "monochrome": "Monochrome (High Noir)",
+    "sunlight": "Sunlight (High Contrast)"
+  },
+  "ethsl": {
+    "tabImage": "Interpreter image",
+    "tabCamera": "Use camera",
+    "speedNormal": "Normal speech",
+    "speedSlow": "Slow speech",
+    "replay": "Replay audio",
+    "watermark": "EthSL Certified Interpreter",
+    "camPreview": "CAMERA PREVIEW",
+    "ready": "Ready",
+    "handPrompt": "🖐️ Show signing hand inside frame",
+    "stepBadge": "Step",
+    "signs": {
+      "lang": {
+        "cue": "Language",
+        "title": "Language Choice Sign",
+        "desc": "Hands alternate left and right, indicating between the language options."
+      },
+      "name": {
+        "cue": "Name",
+        "title": "Name Inquiry Sign",
+        "desc": "Two fingers tap the chest then open forward, inquiring your full name."
+      },
+      "phone": {
+        "cue": "Phone",
+        "title": "Phone & Keypad Sign",
+        "desc": "Thumb to ear and pinky to mouth in phone sign, with dialing finger movements."
+      },
+      "idRoute": {
+        "cue": "ID Document",
+        "title": "Identity Document Sign",
+        "desc": "Flat palm forms the document surface while right hand frames and stamps the ID card."
+      },
+      "support": {
+        "cue": "Accommodations",
+        "title": "Educational Support Sign",
+        "desc": "Right hand rests upon left palm and both elevate together in the universal help sign."
+      },
+      "done": {
+        "cue": "Complete",
+        "title": "Completion & Celebration Sign",
+        "desc": "Both hands wave forward in open celebratory rotation, confirming completion."
+      }
+    }
   }
 }
