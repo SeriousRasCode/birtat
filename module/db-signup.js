@@ -724,13 +724,19 @@ class DbSignup extends HTMLElement {
     this.keypadMode = false;
     this.sunlightMode = false;
     this.visionMode = localStorage.getItem('savanna_vision_mode') || 'default';
-    this.signMode = false;
+    this.justEnteredName = false;
+    this.greetingAudio = null;
+    this.isGreetingPlaying = false;
+    this.audioTimer = null;
+    this.signMode = (localStorage.getItem('savanna_sign_mode') === '1');
     this.signSlow = false;
     this.cameraActive = false;
     this.cameraStream = null;
     this.gestureInput = null;
     this.gestureIndex = 0;
     this.cameraStatus = '';
+    this.signAnimFrame = null;
+    this.signAnimStartTime = 0;
     this.errorMsg = '';
     this.isRecording = false;
     this.promptAudio = null;
@@ -799,7 +805,7 @@ class DbSignup extends HTMLElement {
     if (urlKeypad || this.hasAttribute('keypad') || this.getAttribute('keypad') === 'true') {
       this.keypadMode = true;
     }
-    if (urlSign || this.hasAttribute('sign') || this.getAttribute('sign') === 'true') {
+    if (urlSign || this.hasAttribute('sign') || this.getAttribute('sign') === 'true' || localStorage.getItem('savanna_sign_mode') === '1') {
       this.signMode = true;
     }
     if (this.getAttribute('mode') === 'edit') {
@@ -823,13 +829,19 @@ class DbSignup extends HTMLElement {
         bubbles: true, composed: true, detail: { language: notifyLang }
       }));
     }, 0);
+    this.applyVision(this.visionMode);
     this.render(true);
   }
 
   disconnectedCallback() {
     window.removeEventListener('keydown', this.onKeyDown);
-    if (this.promptAudio) this.promptAudio.pause();
+    if (this.audioTimer) { clearTimeout(this.audioTimer); this.audioTimer = null; }
+    if (this.promptAudio) { try { this.promptAudio.pause(); } catch (_) {} this.promptAudio = null; }
+    if (this.enAudio) { try { this.enAudio.pause(); } catch (_) {} this.enAudio = null; }
+    if (this.greetingAudio) { try { this.greetingAudio.pause(); } catch (_) {} this.greetingAudio = null; }
+    if ('speechSynthesis' in window) { try { window.speechSynthesis.cancel(); } catch (_) {} }
     this.stopCameraStream();
+    this.stopSignAnimation();
   }
 
   stopCameraStream() {
@@ -839,6 +851,8 @@ class DbSignup extends HTMLElement {
         this.cameraStream.getTracks().forEach(t => t.stop());
       } catch (_) {}
       this.cameraStream = null;
+    this.signAnimFrame = null;
+    this.signAnimStartTime = 0;
     }
     this.cameraActive = false;
   }
@@ -940,78 +954,166 @@ class DbSignup extends HTMLElement {
     }
   }
 
-  speak(text, promptKey, nameGreeting) {
+  applyVision(mode) {
+    this.visionMode = mode || 'default';
+    this.sunlightMode = (this.visionMode === 'sunlight');
+    try {
+      localStorage.setItem('savanna_vision_mode', this.visionMode);
+      if (document.documentElement) {
+        document.documentElement.setAttribute('data-vision', this.visionMode);
+        document.documentElement.className = 'vision-' + this.visionMode;
+      }
+    } catch (_) {}
+    window.dispatchEvent(new CustomEvent('db-signup:vision', {
+      bubbles: true,
+      composed: true,
+      detail: { mode: this.visionMode }
+    }));
+  }
+
+
+  speak(text, promptKey, nameGreeting, rawName) {
+    // 1. Immediately cancel any browser speech synthesis that might be speaking
+    if ('speechSynthesis' in window) {
+      try { window.speechSynthesis.cancel(); } catch (_) {}
+    }
+
+    // 2. Clear any pending audio transition timers
+    if (this.audioTimer) {
+      clearTimeout(this.audioTimer);
+      this.audioTimer = null;
+    }
+
+    // 3. Pause any existing audio playback so no two sounds ever overlap
     if (this.promptAudio) {
-      this.promptAudio.pause();
+      try { this.promptAudio.pause(); } catch (_) {}
       this.promptAudio = null;
     }
     if (this.enAudio) {
-      this.enAudio.pause();
+      try { this.enAudio.pause(); } catch (_) {}
       this.enAudio = null;
     }
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
+    if (this.greetingAudio) {
+      try { this.greetingAudio.pause(); } catch (_) {}
+      this.greetingAudio = null;
     }
 
     const lang = this.state.profile.language || 'am';
 
-    // English step
+    // Helper to play the question audio prompt smoothly
+    const playPromptClip = () => {
+      this.isGreetingPlaying = false;
+      this.greetingAudio = null;
+      if (lang === 'en') {
+        if (promptKey) {
+          const audioUrl = SCRIPT_BASE + 'audio/en/' + promptKey + '.mp3';
+          const a = new Audio(audioUrl);
+          this.enAudio = a;
+          this.promptAudio = null; // Strictly keeps smoke-test assertion satisfied
+          a.play().catch(() => {});
+        }
+      } else {
+        if (promptKey) {
+          const audioUrl = SCRIPT_BASE + 'audio/' + lang + '/' + promptKey + '.mp3';
+          const audio = new Audio(audioUrl);
+          this.promptAudio = audio;
+          audio.onerror = () => {
+            this.promptAudio = null;
+            this.speechError();
+          };
+          audio.play().catch(() => {});
+        }
+      }
+    };
+
+    // If on Step 2 (phone) and greeting is active: play greeting FIRST, finish completely, then play prompt!
+    if (nameGreeting && promptKey === 'phone' && rawName) {
+      this.isGreetingPlaying = true;
+      const isNardos = (rawName.trim().toLowerCase() === 'nardos' || rawName.trim() === 'ናርዶስ');
+
+      if (isNardos) {
+        const gUrl = SCRIPT_BASE + 'audio/greeting/nardos_' + lang + '.mp3';
+        const gAudio = new Audio(gUrl);
+        this.greetingAudio = gAudio;
+        let ended = false;
+        const onGreetingEnd = () => {
+          if (!ended) {
+            ended = true;
+            this.greetingAudio = null;
+            // Clean, natural 350ms pause between name greeting and phone question
+            this.audioTimer = setTimeout(() => {
+              playPromptClip();
+            }, 350);
+          }
+        };
+        gAudio.onended = onGreetingEnd;
+        gAudio.onerror = onGreetingEnd;
+        // Long safety timeout (12 seconds) only if audio file completely fails to load
+        this.audioTimer = setTimeout(onGreetingEnd, 12000);
+        gAudio.play().catch(onGreetingEnd);
+        return;
+      } else {
+        const pUrl = SCRIPT_BASE + 'audio/greeting/' + lang + '.mp3';
+        const pAudio = new Audio(pUrl);
+        this.greetingAudio = pAudio;
+        let pEnded = false;
+        const onPrefixEnd = () => {
+          if (!pEnded) {
+            pEnded = true;
+            this.greetingAudio = null;
+            if ('speechSynthesis' in window) {
+              try {
+                window.speechSynthesis.resume();
+                const utter = new SpeechSynthesisUtterance(rawName);
+                let uEnded = false;
+                const onUtterEnd = () => {
+                  if (!uEnded) {
+                    uEnded = true;
+                    this.audioTimer = setTimeout(() => {
+                      playPromptClip();
+                    }, 350);
+                  }
+                };
+                utter.onend = onUtterEnd;
+                utter.onerror = onUtterEnd;
+                window.speechSynthesis.speak(utter);
+                return;
+              } catch (_) {
+                playPromptClip();
+                return;
+              }
+            }
+            playPromptClip();
+          }
+        };
+        pAudio.onended = onPrefixEnd;
+        pAudio.onerror = onPrefixEnd;
+        this.audioTimer = setTimeout(onPrefixEnd, 12000);
+        pAudio.play().catch(onPrefixEnd);
+        return;
+      }
+    }
+
+    // Normal step prompt playback (No overlapping SpeechSynthesis!)
     if (lang === 'en') {
       if (promptKey) {
         const audioUrl = SCRIPT_BASE + 'audio/en/' + promptKey + '.mp3';
         const a = new Audio(audioUrl);
         this.enAudio = a;
+        this.promptAudio = null; // Strictly keeps smoke-test assertion satisfied
         a.play().catch(() => {});
-      }
-      if ('speechSynthesis' in window) {
+      } else if ('speechSynthesis' in window) {
         try {
           const utter = new SpeechSynthesisUtterance(text);
           utter.lang = 'en-US';
           window.speechSynthesis.speak(utter);
         } catch (_) {}
       }
-      this.promptAudio = null; // Strictly keeps smoke-test assertion satisfied
       return;
     }
 
-    // Amharic, Oromo, Tigrinya, and Somali use offline high-quality recorded/generated audio clips
     if (promptKey) {
-      const playClip = () => {
-        const audioUrl = SCRIPT_BASE + 'audio/' + lang + '/' + promptKey + '.mp3';
-        const audio = new Audio(audioUrl);
-        this.promptAudio = audio;
-        audio.onerror = () => {
-          this.promptAudio = null;
-          this.speechError();
-        };
-        audio.play().catch(() => {});
-      };
-
-      // Only speak nameGreeting if present (only on phone step when name was just entered!)
-      if (nameGreeting && 'speechSynthesis' in window) {
-        try {
-          const utter = new SpeechSynthesisUtterance(nameGreeting);
-          // Use en-US so browser's native engine can ALWAYS pronounce the name in every language mode!
-          utter.lang = 'en-US';
-          let played = false;
-          utter.onend = () => {
-            if (!played) { played = true; playClip(); }
-          };
-          utter.onerror = () => {
-            if (!played) { played = true; playClip(); }
-          };
-          setTimeout(() => {
-            if (!played) { played = true; playClip(); }
-          }, 1100);
-          window.speechSynthesis.speak(utter);
-          return;
-        } catch (_) {
-          playClip();
-          return;
-        }
-      }
-
-      playClip();
+      playPromptClip();
       return;
     }
 
@@ -1110,16 +1212,30 @@ class DbSignup extends HTMLElement {
   }
 
   readCurrentStep() {
+    // If name greeting is currently playing, do NOT interrupt or talk over it!
+    if (this.isGreetingPlaying) return;
+
     const steps = ['lang', 'name', 'phone', 'idRoute', 'support'];
     const current = steps[this.state.step];
     const s = this.dict.steps[current];
     if (!s) return;
 
     const rawName = (this.state.profile && this.state.profile.name) ? this.state.profile.name.trim() : '';
-    // ONLY call name ONCE on Step 2 (phone step right after name is entered)
+    const lang = this.state.profile.language || 'am';
+    const GREETINGS = {
+      am: { greeting: (name) => 'እሺ ' + name + '!' },
+      om: { greeting: (name) => 'Tole ' + name + '!' },
+      ti: { greeting: (name) => 'ሕራይ ' + name + '!' },
+      so: { greeting: (name) => 'Waayahay ' + name + '!' },
+      en: { greeting: (name) => 'Okay, ' + name + '!' }
+    };
+
     let nameGreeting = '';
-    if (rawName && this.state.step === 2) {
-      nameGreeting = 'Okay, ' + rawName + '!';
+    // ONLY call name ONCE on Step 2 (phone step right after name is entered)
+    if (rawName && this.state.step === 2 && this.justEnteredName) {
+      const gObj = GREETINGS[lang] || GREETINGS.am;
+      nameGreeting = gObj.greeting(rawName);
+      this.justEnteredName = false; // strictly consume so it is called only once!
     }
 
     let speech = (nameGreeting ? (nameGreeting + ' ') : '') + s.heading + '. ';
@@ -1127,7 +1243,7 @@ class DbSignup extends HTMLElement {
       speech += s.options.map((opt, i) => (i + 1) + ': ' + opt).join('. ');
       if (current === 'support') speech += '. 9: ' + this.dict.finish;
     }
-    this.speak(speech, current, nameGreeting);
+    this.speak(speech, current, nameGreeting, rawName);
   }
 
   startVoiceInput(field) {
@@ -1214,8 +1330,13 @@ class DbSignup extends HTMLElement {
       this.dispatchEvent(new CustomEvent('db-signup:step', {
         bubbles: true, composed: true, detail: { step: this.state.step + 1, of: 5 }
       }));
+      if (fromNameStep) {
+        this.justEnteredName = true;
+        this.autoSpeak = true;
+      } else {
+        this.justEnteredName = false;
+      }
       this.render(true);
-      if (fromNameStep) this.autoSpeak = true;
       if (this.keypadMode || this.autoSpeak) {
         setTimeout(() => {
           if (this.keypadMode || this.autoSpeak) this.readCurrentStep();
@@ -1386,11 +1507,11 @@ class DbSignup extends HTMLElement {
     const isSlow = Boolean(this.signSlow);
 
     const ethslCfg = this.dict.ethsl || {};
-    const tabImageText = ethslCfg.tabImage || 'Interpreter image';
-    const tabCameraText = ethslCfg.tabCamera || 'Use camera';
-    const speedText = isSlow ? (ethslCfg.speedNormal || 'Normal speech') : (ethslCfg.speedSlow || 'Slow speech');
-    const replayText = ethslCfg.replay || 'Replay audio';
-    const watermarkText = ethslCfg.watermark || 'EthSL interpreter';
+    const tabImageText = ethslCfg.tabImage || (this.state.profile.language === 'am' ? 'የምልክት ቋንቋ ስቱዲዮ' : 'EthSL Sign Studio');
+    const tabCameraText = ethslCfg.tabCamera || (this.state.profile.language === 'am' ? 'ካሜራ ይጠቀሙ' : 'Use camera');
+    const speedText = isSlow ? (ethslCfg.speedNormal || '1.0x Normal') : (ethslCfg.speedSlow || '0.5x Slow');
+    const replayText = ethslCfg.replay || (this.state.profile.language === 'am' ? 'ምልክቱን ድገም' : 'Replay Sign');
+    const watermarkText = ethslCfg.watermark || 'EthSL Live Interpreter';
     const camPreviewText = ethslCfg.camPreview || 'CAMERA PREVIEW';
     const readyText = ethslCfg.ready || 'Ready';
     const handPromptText = ethslCfg.handPrompt || '🖐️ Show signing hand inside frame';
@@ -1411,20 +1532,21 @@ class DbSignup extends HTMLElement {
     return '<div class="sign-window" role="region" aria-label="EthSL Sign Language Studio & Camera">' +
       '<div class="sign-window-header">' +
       '<div class="sign-mode-tabs">' +
-      '<button type="button" class="sign-tab ' + (!this.cameraActive ? 'active' : '') + '" id="tab-sign-studio">' + tabImageText + '</button>' +
-      '<button type="button" class="sign-tab ' + (this.cameraActive ? 'active' : '') + '" id="tab-sign-cam">' + tabCameraText + '</button>' +
+      '<button type="button" class="sign-tab ' + (!this.cameraActive ? 'active' : '') + '" id="tab-sign-studio">🖐️ ' + tabImageText + '</button>' +
+      '<button type="button" class="sign-tab ' + (this.cameraActive ? 'active' : '') + '" id="tab-sign-cam">📷 ' + tabCameraText + '</button>' +
       '</div>' +
       '<div class="sign-controls">' +
-      '<button type="button" class="btn-sign-tool" id="btn-sign-speed">' + speedText + '</button>' +
-      '<button type="button" class="btn-sign-tool" id="btn-sign-replay">' + replayText + '</button>' +
+      '<button type="button" class="btn-sign-tool" id="btn-sign-speed">⚡ ' + speedText + '</button>' +
+      '<button type="button" class="btn-sign-tool" id="btn-sign-replay">↺ ' + replayText + '</button>' +
       '</div>' +
       '</div>' +
 
       (!this.cameraActive ?
         ('<div class="studio-stage">' +
           '<div class="studio-frame">' +
-          '<img src="' + SCRIPT_BASE + 'ethsl-signer.jpg" alt="EthSL Certified Sign Language Interpreter" class="studio-model-img">' +
-          '<div class="studio-watermark"><span>' + watermarkText + '</span></div>' +
+          '<div class="studio-watermark"><span class="live-dot">●</span> <span>' + watermarkText + '</span></div>' +
+          '<div class="studio-speed-badge"><span>' + (isSlow ? '0.5x SLOW' : '1.0x LIVE') + '</span></div>' +
+          '<canvas id="ethsl-canvas" class="ethsl-canvas" width="560" height="340"></canvas>' +
           '</div>' +
           '</div>') :
         ('<div class="camera-stage">' +
@@ -1453,13 +1575,317 @@ class DbSignup extends HTMLElement {
 
       '<div class="sign-caption-box">' +
       '<div class="sign-caption-meta">' +
-      '<span class="caption-cue-badge">' + s.cue + '</span>' +
-      '<span class="caption-step-badge">' + stepBadgePrefix + ': ' + (this.state.step + 1) + '</span>' +
+      '<span class="caption-cue-badge">🖐️ ' + s.cue + '</span>' +
+      '<span class="caption-step-badge">' + stepBadgePrefix + ': ' + (this.state.step + 1) + ' / 5</span>' +
       '</div>' +
       '<div class="sign-caption-title">' + s.title + '</div>' +
       '<div class="sign-caption-desc">' + s.desc + '</div>' +
       '</div>' +
       '</div>';
+  }
+
+  stopSignAnimation() {
+    if (this.signAnimFrame) {
+      cancelAnimationFrame(this.signAnimFrame);
+      this.signAnimFrame = null;
+    }
+  }
+
+  startSignAnimation(current) {
+    this.stopSignAnimation();
+    const canvas = this.shadowRoot.querySelector('#ethsl-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    let startTime = performance.now();
+    this.signAnimStartTime = startTime;
+
+    const drawHand = (x, y, angle, type, isRight) => {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(angle);
+      const sign = isRight ? 1 : -1;
+
+      // Palm base
+      ctx.fillStyle = '#b45309';
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 11, 14, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.strokeStyle = '#b45309';
+      ctx.lineWidth = 4;
+      ctx.lineCap = 'round';
+
+      if (type === 'point') {
+        // Pointing index finger
+        ctx.beginPath();
+        ctx.moveTo(2 * sign, -8); ctx.lineTo(4 * sign, -28);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(-6 * sign, 2); ctx.lineTo(-14 * sign, -4);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(5 * sign, 0); ctx.lineTo(10 * sign, 4);
+        ctx.moveTo(4 * sign, 4); ctx.lineTo(9 * sign, 8);
+        ctx.stroke();
+      } else if (type === 'name_tap') {
+        // Two fingers straight
+        ctx.beginPath();
+        ctx.moveTo(0, -8); ctx.lineTo(2 * sign, -26);
+        ctx.moveTo(4 * sign, -8); ctx.lineTo(7 * sign, -25);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(-6 * sign, 0); ctx.lineTo(-10 * sign, 4);
+        ctx.stroke();
+      } else if (type === 'open_what') {
+        // Open hand palm up
+        ctx.beginPath();
+        ctx.moveTo(-8 * sign, -6); ctx.lineTo(-14 * sign, -18);
+        ctx.moveTo(-3 * sign, -8); ctx.lineTo(-6 * sign, -24);
+        ctx.moveTo(2 * sign, -8); ctx.lineTo(2 * sign, -26);
+        ctx.moveTo(7 * sign, -7); ctx.lineTo(10 * sign, -23);
+        ctx.moveTo(11 * sign, -4); ctx.lineTo(16 * sign, -17);
+        ctx.stroke();
+      } else if (type === 'phone') {
+        // 🤙 Phone hand
+        ctx.beginPath();
+        ctx.moveTo(-6 * sign, -4); ctx.lineTo(-18 * sign, -18);
+        ctx.moveTo(8 * sign, 6); ctx.lineTo(20 * sign, 18);
+        ctx.arc(2 * sign, 0, 6, 0, Math.PI);
+        ctx.stroke();
+      } else if (type === 'card_l') {
+        // ID card framing L-shape
+        ctx.beginPath();
+        ctx.moveTo(-6 * sign, -4); ctx.lineTo(-18 * sign, -16);
+        ctx.moveTo(0, -8); ctx.lineTo(0, -26);
+        ctx.stroke();
+      } else if (type === 'flat_support') {
+        // Flat horizontal support palm
+        ctx.beginPath();
+        ctx.moveTo(-16, 0); ctx.lineTo(16, 0);
+        ctx.moveTo(-14, -4); ctx.lineTo(14, -4);
+        ctx.stroke();
+      } else {
+        // Neutral hand
+        ctx.beginPath();
+        ctx.moveTo(-4 * sign, -6); ctx.lineTo(-6 * sign, -18);
+        ctx.moveTo(0, -7); ctx.lineTo(0, -20);
+        ctx.moveTo(4 * sign, -6); ctx.lineTo(6 * sign, -18);
+        ctx.stroke();
+      }
+      ctx.restore();
+    };
+
+    const renderFrame = (now) => {
+      const speed = this.signSlow ? 0.5 : 1.0;
+      const elapsed = ((now - startTime) / 1000) * speed;
+      ctx.clearRect(0, 0, 560, 340);
+
+      // Studio Background
+      const bg = ctx.createRadialGradient(280, 140, 20, 280, 140, 280);
+      bg.addColorStop(0, '#1e293b');
+      bg.addColorStop(1, '#070d18');
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, 560, 340);
+
+      const bob = Math.sin(elapsed * 2.5) * 2;
+
+      // Torso / Blazer
+      ctx.fillStyle = '#065f46';
+      ctx.beginPath();
+      ctx.moveTo(170, 340);
+      ctx.bezierCurveTo(175, 255 + bob, 210, 220 + bob, 280, 220 + bob);
+      ctx.bezierCurveTo(350, 220 + bob, 385, 255 + bob, 390, 340);
+      ctx.closePath();
+      ctx.fill();
+
+      // Shirt collar
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.moveTo(280, 220 + bob);
+      ctx.lineTo(255, 265 + bob);
+      ctx.lineTo(305, 265 + bob);
+      ctx.closePath();
+      ctx.fill();
+
+      // Neck
+      ctx.fillStyle = '#9a3412';
+      ctx.fillRect(266, 175 + bob, 28, 50);
+
+      // Head kinematics tailored for question
+      let headTilt = 0;
+      if (current === 'name') {
+        const loop = elapsed % 4.0;
+        headTilt = loop > 2.6 ? 0.07 : (loop < 1.2 ? -0.04 : 0.02);
+      } else if (current === 'phone') {
+        headTilt = 0.06;
+      } else if (current === 'idRoute') {
+        headTilt = Math.sin(elapsed * 2) * 0.04;
+      } else if (current === 'support') {
+        headTilt = -0.04 + Math.sin(elapsed * 2) * 0.03;
+      } else {
+        headTilt = Math.sin(elapsed * 1.5) * 0.03;
+      }
+
+      ctx.save();
+      ctx.translate(280, 138 + bob);
+      ctx.rotate(headTilt);
+
+      // Head base
+      ctx.fillStyle = '#b45309';
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 38, 46, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Hair
+      ctx.fillStyle = '#1c1917';
+      ctx.beginPath();
+      ctx.ellipse(0, -42, 34, 22, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Eyes
+      const isBlink = Math.sin(elapsed * 0.7) > 0.95;
+      ctx.fillStyle = '#1c1917';
+      if (isBlink) {
+        ctx.fillRect(-18, -4, 11, 2);
+        ctx.fillRect(7, -4, 11, 2);
+      } else {
+        ctx.beginPath();
+        ctx.ellipse(-13, -4, 5, 3.5, 0, 0, Math.PI * 2);
+        ctx.ellipse(13, -4, 5, 3.5, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(-14, -5, 2, 2);
+        ctx.fillRect(12, -5, 2, 2);
+      }
+
+      // Eyebrows
+      ctx.strokeStyle = '#1c1917';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.arc(-13, -12, 8, Math.PI + 0.3, -0.3);
+      ctx.arc(13, -12, 8, Math.PI + 0.3, -0.3);
+      ctx.stroke();
+
+      // Mouth
+      ctx.strokeStyle = '#451a03';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.arc(0, 18, 12, 0.2, Math.PI - 0.2);
+      ctx.stroke();
+
+      ctx.restore();
+
+      // ARMS & HANDS POSITIONS:
+      const sLx = 200, sLy = 240 + bob;
+      const sRx = 360, sRy = 240 + bob;
+
+      let lElbowX = 180, lElbowY = 290 + bob, lHandX = 230, lHandY = 270 + bob, lType = 'neutral', lAng = 0;
+      let rElbowX = 380, rElbowY = 290 + bob, rHandX = 330, rHandY = 270 + bob, rType = 'neutral', rAng = 0;
+
+      if (current === 'name') {
+        // "What is your name?" in EthSL:
+        const loop = elapsed % 4.0;
+        if (loop < 1.2) {
+          // "YOU" -> Pointing forward at user
+          rElbowX = 370; rElbowY = 265 + bob;
+          rHandX = 320; rHandY = 215 + bob;
+          rType = 'point'; rAng = -0.5;
+          lElbowX = 180; lElbowY = 300 + bob; lHandX = 220; lHandY = 300 + bob;
+        } else if (loop < 2.6) {
+          // "NAME" -> Tapping 'ስም' sign
+          const tap = Math.sin(elapsed * 12) * 8;
+          lElbowX = 210; lElbowY = 275 + bob; lHandX = 265; lHandY = 235 + bob;
+          lType = 'name_tap'; lAng = 0.6;
+          rElbowX = 350; rElbowY = 270 + bob; rHandX = 278 + tap; rHandY = 232 + bob - Math.abs(tap);
+          rType = 'name_tap'; rAng = -0.6;
+        } else {
+          // "WHAT?" -> Open palms question
+          lElbowX = 175; lElbowY = 275 + bob; lHandX = 205; lHandY = 230 + bob;
+          lType = 'open_what'; lAng = -0.3;
+          rElbowX = 385; rElbowY = 275 + bob; rHandX = 355; rHandY = 230 + bob;
+          rType = 'open_what'; rAng = 0.3;
+        }
+      } else if (current === 'phone') {
+        // "Phone number?"
+        const loop = elapsed % 4.0;
+        if (loop < 2.0) {
+          // Hand to ear 🤙
+          rElbowX = 390; rElbowY = 250 + bob;
+          rHandX = 345; rHandY = 150 + bob;
+          rType = 'phone'; rAng = -0.8;
+          lElbowX = 190; lElbowY = 290 + bob; lHandX = 230; lHandY = 280 + bob;
+        } else {
+          // Dialing
+          const tap = Math.sin(elapsed * 14) * 6;
+          lElbowX = 200; lElbowY = 265 + bob; lHandX = 260; lHandY = 230 + bob; lType = 'flat_support';
+          rElbowX = 360; rElbowY = 265 + bob; rHandX = 270 + tap; rHandY = 225 + bob; rType = 'point'; rAng = -0.4;
+        }
+      } else if (current === 'idRoute') {
+        // Step 3: Identity Verification ("How to verify identity?")
+        const loop = elapsed % 4.0;
+        if (loop < 2.0) {
+          // Hands form rectangle card in front of chest
+          lElbowX = 210; lElbowY = 265 + bob; lHandX = 240; lHandY = 220 + bob; lType = 'card_l'; lAng = 0.5;
+          rElbowX = 350; rElbowY = 265 + bob; rHandX = 320; rHandY = 220 + bob; rType = 'card_l'; rAng = -0.5;
+          // Draw card outline between hands
+          ctx.strokeStyle = '#38bdf8';
+          ctx.lineWidth = 2.5;
+          ctx.strokeRect(245, 205 + bob, 70, 46);
+        } else {
+          // Present card forward toward user
+          lElbowX = 195; lElbowY = 270 + bob; lHandX = 230; lHandY = 210 + bob; lType = 'open_what'; lAng = -0.2;
+          rElbowX = 365; rElbowY = 270 + bob; rHandX = 330; rHandY = 210 + bob; rType = 'open_what'; rAng = 0.2;
+          ctx.strokeStyle = '#38bdf8';
+          ctx.lineWidth = 3;
+          ctx.strokeRect(235, 195 + bob, 90, 56);
+        }
+      } else if (current === 'support') {
+        // Step 4: School Support ("What support do you need?")
+        const loop = elapsed % 4.0;
+        if (loop < 2.0) {
+          // Support lift: Left palm flat, right hand rests and lifts up together
+          const lift = Math.sin(elapsed * 4) * 20;
+          lElbowX = 210; lElbowY = 275 + bob; lHandX = 260; lHandY = 240 + bob - lift; lType = 'flat_support'; lAng = 0;
+          rElbowX = 350; rElbowY = 275 + bob; rHandX = 280; rHandY = 235 + bob - lift; rType = 'point'; rAng = -0.4;
+        } else {
+          // Assistive gesture: open caring hands elevating upward
+          const lift = Math.sin(elapsed * 4) * 16;
+          lElbowX = 185; lElbowY = 275 + bob; lHandX = 225; lHandY = 210 + bob - lift; lType = 'open_what'; lAng = -0.3;
+          rElbowX = 375; rElbowY = 275 + bob; rHandX = 335; rHandY = 210 + bob - lift; rType = 'open_what'; rAng = 0.3;
+        }
+      } else {
+        // Step 0: Language: alternating sweeping arcs
+        const wave = Math.sin(elapsed * 3) * 25;
+        lElbowX = 175; lElbowY = 280 + bob; lHandX = 195 - wave; lHandY = 230 + bob; lType = 'open_what'; lAng = -0.4;
+        rElbowX = 385; rElbowY = 280 + bob; rHandX = 365 + wave; rHandY = 230 + bob; rType = 'open_what'; rAng = 0.4;
+      }
+
+      ctx.strokeStyle = '#047857';
+      ctx.lineWidth = 22;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(sLx, sLy); ctx.lineTo(lElbowX, lElbowY); ctx.lineTo(lHandX, lHandY);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(sRx, sRy); ctx.lineTo(rElbowX, rElbowY); ctx.lineTo(rHandX, rHandY);
+      ctx.stroke();
+
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(lHandX, lHandY, 11, 0, Math.PI * 2);
+      ctx.arc(rHandX, rHandY, 11, 0, Math.PI * 2);
+      ctx.fill();
+
+      drawHand(lHandX, lHandY, lAng, lType, false);
+      drawHand(rHandX, rHandY, rAng, rType, true);
+
+      this.signAnimFrame = requestAnimationFrame(renderFrame);
+    };
+
+    this.signAnimFrame = requestAnimationFrame(renderFrame);
   }
 
   renderStep(current, progressText) {
@@ -1470,7 +1896,15 @@ class DbSignup extends HTMLElement {
     // ONLY show friendly pill on Step 2 (phone step right after name entry)
     let friendlyPill = '';
     if (rawName && this.state.step === 2) {
-      friendlyPill = '<div class="friendly-pill" role="status"><span>👋 Okay, ' + rawName + '!</span></div>';
+      const GREETINGS = {
+        am: { greeting: (name) => 'እሺ ' + name + '!' },
+        om: { greeting: (name) => 'Tole ' + name + '!' },
+        ti: { greeting: (name) => 'ሕራይ ' + name + '!' },
+        so: { greeting: (name) => 'Waayahay ' + name + '!' },
+        en: { greeting: (name) => 'Okay, ' + name + '!' }
+      };
+      const gObj = GREETINGS[this.state.profile.language || 'am'] || GREETINGS.am;
+      friendlyPill = '<div class="friendly-pill" role="status"><span>👋 ' + gObj.greeting(rawName) + '</span></div>';
     }
 
     if (s.options) {
@@ -1608,17 +2042,12 @@ class DbSignup extends HTMLElement {
     });
 
     on('#select-vision', 'change', (e) => {
-      const mode = e.target.value;
-      this.visionMode = mode;
-      this.sunlightMode = (mode === 'sunlight');
-      localStorage.setItem('savanna_vision_mode', mode);
+      this.applyVision(e.target.value);
       this.render(false);
     });
 
     on('#btn-sun', 'click', () => {
-      this.sunlightMode = !this.sunlightMode;
-      this.visionMode = this.sunlightMode ? 'sunlight' : 'default';
-      localStorage.setItem('savanna_vision_mode', this.visionMode);
+      this.applyVision(this.sunlightMode ? 'default' : 'sunlight');
       this.render(false);
     });
 
@@ -1642,12 +2071,16 @@ class DbSignup extends HTMLElement {
     on('#btn-sign', 'click', () => {
       this.signMode = !this.signMode;
       if (!this.signMode) this.stopCameraStream();
+      try {
+        localStorage.setItem('savanna_sign_mode', this.signMode ? '1' : '0');
+      } catch (_) {}
       this.vibrate(40);
       this.render(false);
     });
 
     on('#tab-sign-studio', 'click', () => {
       this.stopCameraStream();
+    this.stopSignAnimation();
       this.render(false);
     });
 
@@ -1692,6 +2125,7 @@ class DbSignup extends HTMLElement {
 
     on('#btn-sign-replay', 'click', (e) => {
       e.stopPropagation();
+      this.startSignAnimation(current);
       this.readCurrentStep();
     });
 
@@ -2020,9 +2454,9 @@ class DbSignup extends HTMLElement {
 
       /* EthSL Sign Language Studio & Camera */
       '.sign-window {' +
-      '  background: #ffffff;' +
-      '  border: 1.5px solid var(--border-card);' +
-      '  border-radius: 10px;' +
+      '  background: var(--bg-card);' +
+      '  border: 2px solid var(--border-card);' +
+      '  border-radius: 12px;' +
       '  padding: 1.25rem;' +
       '  margin: 0 0 1.75rem;' +
       '}' +
@@ -2030,14 +2464,14 @@ class DbSignup extends HTMLElement {
       '.sign-mode-tabs, .sign-controls { display: flex; gap: 0.5rem; flex-wrap: wrap; }' +
       '.sign-tab, .btn-sign-tool {' +
       '  min-height: 42px;' +
-      '  background: #ffffff;' +
+      '  background: var(--bg-card);' +
       '  border: 1.5px solid var(--border-card);' +
       '  border-radius: 6px;' +
       '  color: var(--text-main);' +
       '  padding: 0.5rem 0.95rem;' +
       '  font: inherit;' +
       '  font-size: 0.88rem;' +
-      '  font-weight: 700;' +
+      '  font-weight: 800;' +
       '  cursor: pointer;' +
       '}' +
       '.sign-tab.active { background: var(--pri); border-color: var(--pri); color: #ffffff; }' +
@@ -2052,28 +2486,47 @@ class DbSignup extends HTMLElement {
       '.studio-frame, .camera-frame {' +
       '  position: relative;' +
       '  width: 100%;' +
-      '  max-width: 500px;' +
-      '  aspect-ratio: 16 / 10;' +
-      '  border: 1.5px solid var(--border-card);' +
-      '  border-radius: 8px;' +
+      '  max-width: 540px;' +
+      '  height: 340px;' +
+      '  background: #020617;' +
+      '  border: 2px solid var(--border-card);' +
+      '  border-radius: 10px;' +
       '  overflow: hidden;' +
-      '  background: #000000;' +
+      '  display: flex;' +
+      '  flex-direction: column;' +
       '}' +
-      '.studio-model-img, .camera-video-stream { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top center; }' +
+      '.ethsl-canvas { width: 100%; height: 100%; display: block; }' +
       '.studio-watermark {' +
       '  position: absolute;' +
       '  top: 10px;' +
       '  left: 10px;' +
-      '  background: #ffffff;' +
-      '  color: #111111;' +
-      '  border: 1.5px solid var(--border-card);' +
+      '  background: rgba(15, 23, 42, 0.88);' +
+      '  color: #ffffff;' +
+      '  border: 1px solid rgba(255, 255, 255, 0.2);' +
       '  border-radius: 4px;' +
-      '  font-size: 0.8rem;' +
+      '  font-size: 0.78rem;' +
       '  font-weight: 800;' +
       '  padding: 0.35rem 0.65rem;' +
-      '  letter-spacing: 0.04em;' +
-      '  text-transform: uppercase;' +
+      '  display: flex;' +
+      '  align-items: center;' +
+      '  gap: 0.4rem;' +
+      '  z-index: 10;' +
       '}' +
+      '.live-dot { color: #ef4444; font-size: 0.9rem; animation: pulse-live 1.2s infinite; }' +
+      '@keyframes pulse-live { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.3; transform: scale(0.85); } }' +
+      '.studio-speed-badge {' +
+      '  position: absolute;' +
+      '  top: 10px;' +
+      '  right: 10px;' +
+      '  background: var(--pri);' +
+      '  color: #ffffff;' +
+      '  border-radius: 4px;' +
+      '  font-size: 0.75rem;' +
+      '  font-weight: 800;' +
+      '  padding: 0.35rem 0.65rem;' +
+      '  z-index: 10;' +
+      '}' +
+      '.camera-video-stream { display: block; width: 100%; height: 100%; object-fit: cover; }' +
       '.camera-hud { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between; padding: 0.85rem; pointer-events: none; }' +
       '.hud-top { display: flex; justify-content: space-between; align-items: center; }' +
       '.hud-rec { background: #dc2626; color: #ffffff; padding: 0.3rem 0.6rem; border-radius: 4px; font-size: 0.76rem; font-weight: 800; letter-spacing: 0.05em; }' +
@@ -2113,7 +2566,7 @@ class DbSignup extends HTMLElement {
       '  font-weight: 800;' +
       '  cursor: pointer;' +
       '}' +
-      '.sign-caption-box { margin-top: 1.15rem; background: #f9fafb; border: 1.5px solid var(--border-card); border-radius: 8px; padding: 0.95rem 1.15rem; text-align: start; }' +
+      '.sign-caption-box { margin-top: 1.15rem; background: var(--bg-alt, #f9fafb); border: 1.5px solid var(--border-card); border-radius: 8px; padding: 0.95rem 1.15rem; text-align: start; }' +
       '.sign-caption-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.45rem; }' +
       '.caption-cue-badge { background: var(--pri); color: #ffffff; padding: 0.25rem 0.65rem; border-radius: 4px; font-size: 0.82rem; font-weight: 800; }' +
       '.caption-step-badge { color: var(--text-muted); font-size: 0.82rem; font-weight: 700; text-transform: uppercase; }' +
@@ -2121,8 +2574,8 @@ class DbSignup extends HTMLElement {
       '.sign-caption-desc { font-size: 0.95rem; color: var(--text-muted); line-height: 1.6; }' +
 
       /* Keypad */
-      '.friendly-pill { display: inline-flex; align-items: center; gap: 0.5rem; background: #f4f4f6; color: var(--text-main); border: 1.5px solid var(--border-card); padding: 0.45rem 1rem; border-radius: 9999px; font-size: 0.95rem; font-weight: 800; margin-bottom: 0.95rem; }' +
-      '.on-screen-keypad { background: #f9fafb; border: 1.5px solid var(--border-card); border-radius: 10px; padding: 1.25rem; margin-bottom: 1.5rem; }' +
+      '.friendly-pill { display: inline-flex; align-items: center; gap: 0.5rem; background: var(--bg-alt, #f4f4f6); color: var(--text-main); border: 1.5px solid var(--border-card); padding: 0.45rem 1rem; border-radius: 9999px; font-size: 0.95rem; font-weight: 800; margin-bottom: 0.95rem; }' +
+      '.on-screen-keypad { background: var(--bg-alt, #f9fafb); border: 1.5px solid var(--border-card); border-radius: 10px; padding: 1.25rem; margin-bottom: 1.5rem; }' +
       '.keypad-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.65rem; max-width: 280px; margin: 0 auto; }' +
       '.pad-num {' +
       '  min-height: 58px;' +
